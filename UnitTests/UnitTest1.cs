@@ -25,6 +25,14 @@ namespace UnitTests
 			Assert.AreEqual(4, list.Count);
 			Assert.AreEqual("1", list[0]);
 			Assert.AreEqual("2", list[1]);
+
+			// delete
+			DataUtils.DeleteRecord("1", RecordTypes.itineraryFileName);
+
+			// retrieve nothing
+			result = DataUtils.GetRecord("1", RecordTypes.itineraryFileName);
+			list = GetCSharpList(result);
+			Assert.IsFalse(result.Any());
 		}
 
 		[TestMethod]

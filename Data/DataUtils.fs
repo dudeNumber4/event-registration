@@ -66,6 +66,27 @@ module DataUtils =
                          else failwith (sprintf "%s: expected list length > 2" fileName)
     | _ -> failwith (sprintf "%s: unexpected value" fileName)
 
+  // Iterate through the reader writing to the writer unless line with id is found
+  let rec private deleteLineWith_ id (reader:StreamReader) (writer:StreamWriter) =
+    if (reader.EndOfStream) then ()
+    else
+      let currentLine = reader.ReadLine()
+      let currentWords = StringUtils.getQuotedStrings currentLine
+      if (currentWords.Head <> id) then writer.WriteLine(currentLine)
+      deleteLineWith_ id reader writer
+    
+  let private deleteLineWith id (filePath:string) =
+    let tempPath = filePath + ".tmp"
+    let reader = new StreamReader(filePath)
+    let writer = new StreamWriter(tempPath)
+    try
+      deleteLineWith_ id reader writer |> ignore
+    finally
+      reader.Close() |> ignore
+      writer.Close() |> ignore
+    File.Delete(filePath)
+    File.Move(tempPath, filePath)
+
   // Given open stream, return empty string or string list of line with matching id
   let rec private getLineWith_ id (reader:StreamReader) =
     if (reader.EndOfStream) then []
@@ -91,3 +112,13 @@ module DataUtils =
     | "Itinerary.csv" -> getLineWith id (Path.Combine(dataDirectory, RecordTypes.itineraryFileName))
     | _ -> failwith (sprintf "%s: unexpected value" fileName)
 
+  // Pass id and the type of record.
+  // param fileName is one of RecordTypes' file names
+  let public DeleteRecord id fileName =
+    match fileName with
+    // You'd think you could match on a value like RecordTypes.RegistrantRecord, but you can't
+    | "Registrant.csv" -> deleteLineWith id (Path.Combine(dataDirectory, RecordTypes.registrantFileName))
+    | "Registration.csv" -> deleteLineWith id (Path.Combine(dataDirectory, RecordTypes.registrationFileName))
+    | "Session.csv" -> deleteLineWith id (Path.Combine(dataDirectory, RecordTypes.sessionFileName))
+    | "Itinerary.csv" -> deleteLineWith id (Path.Combine(dataDirectory, RecordTypes.itineraryFileName))
+    | _ -> failwith (sprintf "%s: unexpected value" fileName)
