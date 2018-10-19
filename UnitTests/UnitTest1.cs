@@ -13,67 +13,92 @@ namespace UnitTests
 	public class UnitTest1
 	{
 
-		[TestMethod]
-		public void ItineraryRecord()
+		[ClassCleanup]
+		public static void ClassCleanup()
 		{
-			// add the record
-			DataUtils.AddRecord(RecordTypes.itineraryFileName, GetItineraryRecord());
+			DataUtils.DeleteFile(RecordTypes.itineraryFileName);
+			DataUtils.DeleteFile(RecordTypes.registrantFileName);
+			DataUtils.DeleteFile(RecordTypes.registrationFileName);
+			DataUtils.DeleteFile(RecordTypes.sessionFileName);
+		}
 
-			// retrieve
-			FSharpList<string> result = DataUtils.GetRecord("1", RecordTypes.itineraryFileName);
+		[TestMethod]
+		[DataRow("Registrant.csv")]
+		[DataRow("Registration.csv")]
+		[DataRow("Session.csv")]
+		[DataRow("Itinerary.csv")]
+		public void ProcessRecord(string fileName)
+		{
+			// add 2 records of the given type
+			DataUtils.AddRecord(fileName, ListModule.OfSeq(GetEnumerable(fileName)));
+			DataUtils.AddRecord(fileName, ListModule.OfSeq(GetEnumerable(fileName)));
+
+			// retrieve by id (should have fresh ids)
+			FSharpList<string> result = DataUtils.GetRecord("1", fileName);
 			var list = GetCSharpList(result);
-			Assert.AreEqual(4, list.Count);
+			Assert.AreEqual(GetRecordCount(fileName), list.Count);
 			Assert.AreEqual("1", list[0]);
-			Assert.AreEqual("2", list[1]);
+			Assert.AreEqual(GetEnumerable(fileName).First(), list[1]);
 
 			// delete
-			DataUtils.DeleteRecord("1", RecordTypes.itineraryFileName);
+			DataUtils.DeleteRecord("1", fileName);
 
 			// retrieve nothing
-			result = DataUtils.GetRecord("1", RecordTypes.itineraryFileName);
+			result = DataUtils.GetRecord("1", fileName);
 			list = GetCSharpList(result);
 			Assert.IsFalse(result.Any());
 		}
 
-		[TestMethod]
-		public void SessionRecord()
+		private int GetRecordCount(string fileName)
 		{
-			// add the record
-			DataUtils.AddRecord(RecordTypes.sessionFileName, GetSessionRecord());
-
-			// retrieve
-			FSharpList<string> result = DataUtils.GetRecord("1", RecordTypes.sessionFileName);
-			var list = GetCSharpList(result);
-			Assert.AreEqual(4, list.Count);
-			Assert.AreEqual("1", list[0]);
-			Assert.AreEqual("2", list[1]);
+			switch (fileName)
+			{
+				case "Itinerary.csv": return 4;
+				case "Registrant.csv": return 6;
+				case "Registration.csv": return 2;
+				case "Session.csv": return 4;
+				default: return 0;
+			}
 		}
 
-		[TestMethod]
-		public void RegistrantRecord()
+		private IEnumerable<string> GetEnumerable(string fileName)
 		{
-			// add the record
-			DataUtils.AddRecord(RecordTypes.registrantFileName, GetRegistrantRecord());
-
-			// retrieve
-			FSharpList<string> result = DataUtils.GetRecord("1", RecordTypes.registrantFileName);
-			var list = GetCSharpList(result);
-			Assert.AreEqual(6, list.Count);
-			Assert.AreEqual("1", list[0]);
-			Assert.AreEqual("2", list[1]);
+			switch (fileName)
+			{
+				case "Itinerary.csv": return GetItineraryEnumerable();
+				case "Registrant.csv": return GetRegistrantEnumerable();
+				case "Registration.csv": return GetRegistrationEnumerable();
+				case "Session.csv": return GetSessionEnumerable();
+				default: return Enumerable.Empty<string>();
+			}
 		}
 
-		[TestMethod]
-		public void RegistrationRecord()
+		private IEnumerable<string> GetRegistrantEnumerable()
 		{
-			// add the record
-			DataUtils.AddRecord(RecordTypes.registrationFileName, GetRegistrationRecord());
+			yield return "firstName";
+			yield return "lastName";
+			yield return "email";
+			yield return "orgName";
+			yield return "industry";
+		}
 
-			// retrieve
-			FSharpList<string> result = DataUtils.GetRecord("1", RecordTypes.registrationFileName);
-			var list = GetCSharpList(result);
-			Assert.AreEqual("1", list[0]);
-			Assert.AreEqual("2", list[1]);
+		private IEnumerable<string> GetRegistrationEnumerable()
+		{
+			yield return "registrant id";
+		}
+
+		private IEnumerable<string> GetSessionEnumerable()
+		{
+			yield return "day";
+			yield return "title";
+			yield return "description";
+		}
+
+		private IEnumerable<string> GetItineraryEnumerable()
+		{
+			yield return "registration id";
+			yield return "session id 1";
+			yield return "session id 1";
 		}
 
 		/// <summary>
@@ -85,52 +110,6 @@ namespace UnitTests
 		{
 			IEnumerable<string> enumerable = SeqModule.OfList(list);
 			return new List<string>(enumerable);
-		}
-
-		private FSharpList<string> GetItineraryRecord()
-		{
-			return ListModule.OfSeq(GetSessionRecordEnumerable());  // 4 items will test itinerary
-		}
-
-		private FSharpList<string> GetSessionRecord()
-		{
-			// ListModule is F# list.
-			return ListModule.OfSeq(GetSessionRecordEnumerable());
-		}
-
-		private FSharpList<string> GetRegistrantRecord()
-		{
-			return ListModule.OfSeq(GetRegistrantRecordEnumerable());
-		}
-
-		private FSharpList<string> GetRegistrationRecord()
-		{
-			return ListModule.OfSeq(GetRegistrationRecordEnumerable());
-		}
-
-		/// <summary>
-		/// Just get 4 fields.
-		/// </summary>
-		private IEnumerable<string> GetSessionRecordEnumerable()
-		{
-			return GetRegistrationRecordEnumerable().Concat(GetRegistrationRecordEnumerable());
-		}
-
-		/// <summary>
-		/// Just get 6 fields.
-		/// </summary>
-		private IEnumerable<string> GetRegistrantRecordEnumerable()
-		{
-			return GetRegistrationRecordEnumerable().Concat(GetRegistrationRecordEnumerable()).Concat(GetRegistrationRecordEnumerable());
-		}
-
-		/// <summary>
-		/// A registration record is just 2 ids.
-		/// </summary>
-		private IEnumerable<string> GetRegistrationRecordEnumerable()
-		{
-			yield return "1";
-			yield return "2";
 		}
 
 	}

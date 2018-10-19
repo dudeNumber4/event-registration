@@ -4,4 +4,4 @@ bin
 obj
 packages
 .vs
-/UnitTests/obj
+UnitTests/obj/

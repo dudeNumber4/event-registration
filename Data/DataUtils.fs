@@ -47,25 +47,6 @@ module DataUtils =
                            let newLine = (List.fold (fun accumulator current -> sprintf "%s,\"%s\"" accumulator current) csv SessionIds) + Environment.NewLine
                            File.AppendAllText(fileName, newLine) |> ignore
 
-  // param fileName is one of RecordTypes' file names
-  let public AddRecord fileName (list:string List) =
-    match fileName with
-    // You'd think you could match on a value like RecordTypes.RegistrantRecord, but you can't
-    | "Registrant.csv" -> if (list.Length = 6) then
-                            addRecord (EventRegistrationRecord.RegistrantRecord((list.[0], list.[1], list.[2], list.[3], list.[4], list.[5])))
-                          else failwith (sprintf "%s: expected list length of 6" fileName)
-    | "Registration.csv" -> if (list.Length = 2) then
-                              addRecord (EventRegistrationRecord.RegistrationRecord((list.[0], list.[1])))
-                            else failwith (sprintf "%s: expected list length of 2" fileName)
-    | "Session.csv" -> if (list.Length = 4) then
-                         addRecord (EventRegistrationRecord.SessionRecord((list.[0], list.[1], list.[2], list.[3])))
-                       else failwith (sprintf "%s: expected list length of 4" fileName)
-    | "Itinerary.csv" -> if (list.Length > 2) then
-                           let sessionList = List.skip 2 list  // peel off the session list
-                           addRecord (EventRegistrationRecord.ItineraryRecord((list.[0], list.[1], sessionList)))
-                         else failwith (sprintf "%s: expected list length > 2" fileName)
-    | _ -> failwith (sprintf "%s: unexpected value" fileName)
-
   // Iterate through the reader writing to the writer unless line with id is found
   let rec private deleteLineWith_ id (reader:StreamReader) (writer:StreamWriter) =
     if (reader.EndOfStream) then ()
@@ -87,7 +68,7 @@ module DataUtils =
     File.Delete(filePath)
     File.Move(tempPath, filePath)
 
-  // Given open stream, return empty string or string list of line with matching id
+  // Given open stream, return string list of line with matching id
   let rec private getLineWith_ id (reader:StreamReader) =
     if (reader.EndOfStream) then []
     else
@@ -96,10 +77,63 @@ module DataUtils =
       if (currentWords.Head = id) then currentWords
       else getLineWith_ id reader
 
-  // Return empty string or string list of line with matching id
+  // Return string list of line (list contains line's values) with matching id
   let private getLineWith id (filePath:string) =
     use reader = new StreamReader(filePath)
     getLineWith_ id reader
+
+  // Given open stream, return max id of file
+  let rec private getMaxId_ id currentMax (reader:StreamReader) =
+    if (reader.EndOfStream) then currentMax
+    else
+      let currentLine = reader.ReadLine()
+      let currentFields = StringUtils.getQuotedStrings currentLine
+      match currentFields with
+      | [] -> currentMax  // blank line for some reason
+      | head :: t -> let currentId = System.Convert.ToInt32(head)
+                     if (currentId < currentMax) then
+                       getMaxId_ id currentMax reader
+                     else 
+                       getMaxId_ id currentId reader
+      | _ -> failwith "Corrupt data record encountered" // should never be one item in the list
+
+  // Return max id of file
+  let private getMaxId (filePath:string) =
+    if (File.Exists(filePath)) then
+      use reader = new StreamReader(filePath)
+      getMaxId_ id 0 reader
+    else
+      0
+
+  // param fileName is one of RecordTypes' file names
+  let private nextId fileName =
+    match fileName with
+    // You'd think you could match on a value like RecordTypes.RegistrantRecord, but you can't
+    | "Registrant.csv" -> getMaxId (Path.Combine(dataDirectory, RecordTypes.registrantFileName)) + 1
+    | "Registration.csv" -> getMaxId (Path.Combine(dataDirectory, RecordTypes.registrationFileName)) + 1
+    | "Session.csv" -> getMaxId (Path.Combine(dataDirectory, RecordTypes.sessionFileName)) + 1
+    | "Itinerary.csv" -> getMaxId (Path.Combine(dataDirectory, RecordTypes.itineraryFileName)) + 1
+    | _ -> failwith (sprintf "%s: unexpected file name value" fileName)
+
+  // param fileName is one of RecordTypes' file names
+  let public AddRecord fileName (list:string List) =
+    let id = (nextId fileName).ToString()
+    match fileName with
+    // You'd think you could match on a value like RecordTypes.RegistrantRecord, but you can't
+    | "Registrant.csv" -> if (list.Length = 5) then
+                            addRecord (EventRegistrationRecord.RegistrantRecord((id, list.[0], list.[1], list.[2], list.[3], list.[4])))
+                          else failwith (sprintf "%s: expected list length of 5" fileName)
+    | "Registration.csv" -> if (list.Length = 1) then
+                              addRecord (EventRegistrationRecord.RegistrationRecord((id, list.[0])))
+                            else failwith (sprintf "%s: expected list length of 1" fileName)
+    | "Session.csv" -> if (list.Length = 3) then
+                         addRecord (EventRegistrationRecord.SessionRecord((id, list.[0], list.[1], list.[2])))
+                       else failwith (sprintf "%s: expected list length of 3" fileName)
+    | "Itinerary.csv" -> if (list.Length > 1) then
+                           let sessionList = List.skip 1 list  // peel off the session list
+                           addRecord (EventRegistrationRecord.ItineraryRecord((id, list.[0], sessionList)))
+                         else failwith (sprintf "%s: expected list length > 1" fileName)
+    | _ -> failwith (sprintf "%s: unexpected value" fileName)
 
   // Pass id and the type of record.  I may want to transform these into tuples later.
   // param fileName is one of RecordTypes' file names
@@ -110,7 +144,7 @@ module DataUtils =
     | "Registration.csv" -> getLineWith id (Path.Combine(dataDirectory, RecordTypes.registrationFileName))
     | "Session.csv" -> getLineWith id (Path.Combine(dataDirectory, RecordTypes.sessionFileName))
     | "Itinerary.csv" -> getLineWith id (Path.Combine(dataDirectory, RecordTypes.itineraryFileName))
-    | _ -> failwith (sprintf "%s: unexpected value" fileName)
+    | _ -> failwith (sprintf "%s: unexpected file name value" fileName)
 
   // Pass id and the type of record.
   // param fileName is one of RecordTypes' file names
@@ -121,4 +155,16 @@ module DataUtils =
     | "Registration.csv" -> deleteLineWith id (Path.Combine(dataDirectory, RecordTypes.registrationFileName))
     | "Session.csv" -> deleteLineWith id (Path.Combine(dataDirectory, RecordTypes.sessionFileName))
     | "Itinerary.csv" -> deleteLineWith id (Path.Combine(dataDirectory, RecordTypes.itineraryFileName))
-    | _ -> failwith (sprintf "%s: unexpected value" fileName)
+    | _ -> failwith (sprintf "%s: unexpected file name value" fileName)
+
+  // param fileName is one of RecordTypes' file names
+  let public DeleteFile fileName =
+    let mutable path = ""
+    match fileName with
+    // You'd think you could match on a value like RecordTypes.RegistrantRecord, but you can't
+    | "Registrant.csv" -> path <- (Path.Combine(dataDirectory, RecordTypes.registrantFileName))
+    | "Registration.csv" -> path <- (Path.Combine(dataDirectory, RecordTypes.registrationFileName))
+    | "Session.csv" -> path <- (Path.Combine(dataDirectory, RecordTypes.sessionFileName))
+    | "Itinerary.csv" -> path <- (Path.Combine(dataDirectory, RecordTypes.itineraryFileName))
+    | _ -> ()
+    if (File.Exists(path)) then File.Delete(path) |> ignore
