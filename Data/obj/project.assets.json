@@ -321,10 +321,12 @@
       ]
     },
     "FSharpx.Collections/2.0.0-beta3": {
-      "sha512": "CEHkALI7+lTOnZ8bjwKWZYcm/H8FWzyMQIgnFEu6xG5CuXmf81jlP4dg3RZTxtYLlt+gWIr7w1QCGTOD9qITQw==",
+      "sha512": "zGI7mViI27usgHMFXsy04Wasfx7BSyWfUXvyZIRwJQOHWjU9pj1eulmGAsO8rRq+MMt0Z7zGnOUMLFAk7j7kSQ==",
       "type": "package",
       "path": "fsharpx.collections/2.0.0-beta3",
       "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
         "fsharpx.collections.2.0.0-beta3.nupkg.sha512",
         "fsharpx.collections.nuspec",
         "lib/net45/FSharp.Core.dll",
@@ -657,10 +659,11 @@
       ]
     },
     "Microsoft.NETCore.Platforms/2.1.0": {
-      "sha512": "TT+QCi9LcxGTjBssH7S7n5+8DVcwfG4DYgXX7Dk7+BfZ4oVHj8Q0CbYk9glzAlHLsSt3bYzol+fOdra2iu6GOw==",
+      "sha512": "aSTPL94NloSiQVL5Len8wbjFKOnoAX/vOh3s3DF6g3c7GUUMLCDvnBhmA72M2iN2AedyA8hpr7m89kzSAKUnJQ==",
       "type": "package",
       "path": "microsoft.netcore.platforms/2.1.0",
       "files": [
+        ".nupkg.metadata",
         ".signature.p7s",
         "LICENSE.TXT",
         "THIRD-PARTY-NOTICES.TXT",
