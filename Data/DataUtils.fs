@@ -18,8 +18,12 @@ module DataUtils =
 
   let private ensureDataFileExists filePath =
     if not (File.Exists(filePath)) then
-      use f = File.CreateText(filePath)
-      ()  // use can't be the last statement :(
+      try
+        use f = File.CreateText(filePath)
+        ()  // use can't be the last statement :(
+      with
+        | :? System.FieldAccessException -> () // async, tests show create directly after check for existence fails.
+
 
   let private addRecord record =
     match record with
@@ -100,8 +104,11 @@ module DataUtils =
   // Return max id of file
   let private getMaxId (filePath:string) =
     if (File.Exists(filePath)) then
-      use reader = new StreamReader(filePath)
-      getMaxId_ id 0 reader
+      try
+        use reader = new StreamReader(filePath)
+        getMaxId_ id 0 reader
+      with
+        | :? System.FieldAccessException -> 0 // async, tests show attempt to access, file doesn't exist directly after check for existence returns true.
     else
       0
 

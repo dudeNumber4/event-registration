@@ -14,7 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
-    <ProjectReference Include="..\Data\EventData.fsproj" />
+    <ProjectReference Include="..\EventRepository\EventRepository.csproj" />
   </ItemGroup>
 
 </Project>

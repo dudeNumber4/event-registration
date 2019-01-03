@@ -7,8 +7,11 @@ using Common;
 namespace UnitTests
 {
 
+	/// <summary>
+	/// Tests of the common models/objects.
+	/// </summary>
 	[TestClass]
-	public class CommonTests
+	public class SessionListTests
 	{
 
 		private static SessionList GetSingleSessionList() => new SessionList
