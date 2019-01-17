@@ -23,8 +23,6 @@ namespace EventWeb.Server.Controllers
 		}
 
 		/// <summary>
-		/// RESUME: Let's get this calling through to the client with the type.
-		/// Prolly, we'll want to post up with the type and have that go through as is to the repository.  Which means the repo will have to change those from records to types as well.
 		/// </summary>
 		/// <param name="id"></param>
 		/// <returns></returns>

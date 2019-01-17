@@ -1,0 +1,34 @@
+﻿@page "/sessions"
+@inherits SessionsPage
+
+<h1>Sessions</h1>
+<p>Grabs the sessions from the server.</p>
+
+@if (_sessions == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Day</th>
+                <th>Title</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var session in _sessions)
+            {
+                <tr>
+                    <td>@session.Id</td>
+                    <td>@session.Day</td>
+                    <td>@session.Title</td>
+                    <td>@session.Description</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

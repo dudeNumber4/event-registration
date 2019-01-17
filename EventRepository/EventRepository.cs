@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace EventRepository
 {
@@ -83,6 +84,28 @@ namespace EventRepository
 			return new Session().FromBasicRecord(record) as Session;
 		}
 
+		public async Task<List<Session>> GetAllSessions()
+		{
+			FSharpList<FSharpList<string>> dataSessions = await Task.FromResult(DataUtils.GetAllSessions());
+			return GetCSharpList(dataSessions).Select(s => new Session().FromBasicRecord(s) as Session).ToList();
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="list">F# list of F# List of string</param>
+		/// <returns>C# list of list of string</returns>
+		private List<List<string>> GetCSharpList(FSharpList<FSharpList<string>> list)
+		{
+			var result = new List<List<string>>(list.Count());
+			IEnumerable<FSharpList<string>> enumerable = SeqModule.OfList(list);
+			foreach (var item in enumerable)
+			{
+				result.Add(GetCSharpList(item));
+			}
+			return result;
+		}
+		
 		/// <summary>
 		/// 
 		/// </summary>

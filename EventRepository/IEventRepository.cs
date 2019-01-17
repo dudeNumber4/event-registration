@@ -25,6 +25,7 @@ namespace EventRepository
 		Task<Registration> GetRegistration(string id);
 		Task<Registrant> GetRegistrant(string id);
 		Task<Session> GetSession(string id);
+		Task<List<Session>> GetAllSessions();
 
 		/// <summary>
 		/// 

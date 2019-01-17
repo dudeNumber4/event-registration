@@ -99,7 +99,6 @@ module DataUtils =
                        getMaxId_ id currentMax reader
                      else 
                        getMaxId_ id currentId reader
-      | _ -> failwith "Corrupt data record encountered" // should never be one item in the list
 
   // Return max id of file
   let private getMaxId (filePath:string) =
@@ -175,3 +174,7 @@ module DataUtils =
     | "Itinerary.csv" -> path <- (Path.Combine(dataDirectory, RecordTypes.itineraryFileName))
     | _ -> ()
     if (File.Exists(path)) then File.Delete(path) |> ignore
+
+  let public GetAllSessions() =
+    let maxId = getMaxId (Path.Combine(dataDirectory, RecordTypes.sessionFileName))
+    List.init maxId ( fun i -> (GetRecord ((i + 1).ToString()) "Session.csv") )

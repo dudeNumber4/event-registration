@@ -1,6 +1,0 @@
-C:\Data\SideProjects\EventRegistration\Data\bin\Debug\netcoreapp2.1\Data.deps.json
-C:\Data\SideProjects\EventRegistration\Data\bin\Debug\netcoreapp2.1\Data.dll
-C:\Data\SideProjects\EventRegistration\Data\bin\Debug\netcoreapp2.1\Data.pdb
-C:\Data\SideProjects\EventRegistration\Data\obj\Debug\netcoreapp2.1\Data.fsprojAssemblyReference.cache
-C:\Data\SideProjects\EventRegistration\Data\obj\Debug\netcoreapp2.1\Data.dll
-C:\Data\SideProjects\EventRegistration\Data\obj\Debug\netcoreapp2.1\Data.pdb

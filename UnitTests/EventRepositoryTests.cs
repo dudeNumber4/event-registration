@@ -34,6 +34,17 @@ namespace UnitTests
 		}
 
 		[TestMethod]
+		public void GetAllSessions()
+		{
+			Task.WaitAll(new Task[] { _eventRepository.AddRecord(RecordTypes.Session, GetEnumerableDataFor(RecordTypes.Session)) });
+			Task.WaitAll(new Task[] { _eventRepository.AddRecord(RecordTypes.Session, GetEnumerableDataFor(RecordTypes.Session)) });
+			List<Session> result = _eventRepository.GetAllSessions().Result;
+			Assert.AreEqual(2, result.Count);
+			ValidateEventRecord(result[0], RecordTypes.Session);
+			ValidateEventRecord(result[1], RecordTypes.Session);
+		}
+
+		[TestMethod]
 		[DataRow(RecordTypes.Registrant)]
 		[DataRow(RecordTypes.Registration)]
 		[DataRow(RecordTypes.Session)]
@@ -41,8 +52,8 @@ namespace UnitTests
 		public void ProcessRecord(RecordTypes rt)
 		{
 			// add 2 records of the given type
-			Task.WaitAll( new Task[] { _eventRepository.AddRecord(rt, GetEnumerable(rt)) } );
-			Task.WaitAll(new Task[] { _eventRepository.AddRecord(rt, GetEnumerable(rt)) });
+			Task.WaitAll( new Task[] { _eventRepository.AddRecord(rt, GetEnumerableDataFor(rt)) } );
+			Task.WaitAll(new Task[] { _eventRepository.AddRecord(rt, GetEnumerableDataFor(rt)) });
 
 			// retrieve by id (should have fresh ids)
 			var eventRecord = GetEventRecord(rt);
@@ -105,7 +116,7 @@ namespace UnitTests
 			return result;
 		}
 
-		internal static IEnumerable<string> GetEnumerable(RecordTypes rt)
+		internal static IEnumerable<string> GetEnumerableDataFor(RecordTypes rt)
 		{
 			switch (rt)
 			{

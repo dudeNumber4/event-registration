@@ -9,11 +9,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "UnitTests\Unit
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common", "Common\Common.csproj", "{2F99F0DD-74BD-4CAD-9F69-992067750FC8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventWeb.Server", "EventWeb.Server\EventWeb.Server.csproj", "{404EF095-8238-4743-BA2E-C55A407570D8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventWeb.Server", "EventWeb.Server\EventWeb.Server.csproj", "{404EF095-8238-4743-BA2E-C55A407570D8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventWeb.App", "EventWeb.App\EventWeb.App.csproj", "{AA3837F6-8338-4204-8848-D96C290EF2F8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventWeb.App", "EventWeb.App\EventWeb.App.csproj", "{AA3837F6-8338-4204-8848-D96C290EF2F8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventRepository", "EventRepository\EventRepository.csproj", "{B44B5330-7021-43A6-836C-3C929AA8A42D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventRepository", "EventRepository\EventRepository.csproj", "{B44B5330-7021-43A6-836C-3C929AA8A42D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

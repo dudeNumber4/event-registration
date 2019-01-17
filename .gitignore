@@ -4,4 +4,9 @@ bin
 obj
 packages
 .vs
-UnitTests/obj/
+/UnitTests/obj
+/EventRepository/obj
+/Common/obj
+/EventWeb.App/obj
+/EventWeb.Server/obj
+/Data/obj
