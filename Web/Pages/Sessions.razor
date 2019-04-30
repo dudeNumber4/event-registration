@@ -1,0 +1,65 @@
+﻿@page "/sessions"
+@using EventRegistration.Data
+@using EventModels
+@inject SessionService SessionService
+
+@if (sessions == null)
+{
+    <p><em>Roading...</em></p>
+}
+else
+{
+    <h3>Sessions</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Day</th>
+                <th>Title</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var session in sessions)
+            {
+                <tr>
+                    <td><button class="btn btn-primary" onclick="@(e => DeleteSession(e, session.Id))">Delete Session</button></td>
+                    <td>@session.Day</td>
+                    <td>@session.Title</td>
+                    <td>@session.Description</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div>
+        <button class="btn btn-primary" onclick="@(e => DeleteAll(e))">Delete all Sessions</button>
+    </div>
+}
+
+
+@functions {
+    List<Session> sessions;
+
+    protected override async Task OnInitAsync()
+    {
+        await LoadSessions(true);
+    }
+
+    async Task DeleteAll(UIMouseEventArgs e)
+    {
+        await SessionService.DeleteAllSessions();
+        await LoadSessions(false);
+    }
+
+    async Task DeleteSession(UIMouseEventArgs e, int id)
+    {
+        await SessionService.DeleteSession(id);
+        // Note that each time I call this, something is watching it (not sure how that mechanism works), and the UI is updated
+        await LoadSessions(false);
+    }
+
+    async Task LoadSessions(bool createNew = true)
+    {
+        sessions = await SessionService.GetAllSessions(createNew);
+    }
+
+}

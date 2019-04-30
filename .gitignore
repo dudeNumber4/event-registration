@@ -4,6 +4,7 @@ bin
 obj
 packages
 .vs
+.cr
 /UnitTests/obj
 /EventRepository/obj
 /Common/obj
