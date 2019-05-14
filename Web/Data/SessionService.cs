@@ -12,9 +12,8 @@ namespace EventRegistration.Data
     /// <summary>
     /// This "service" is really in place of some API in some very complex separate project/solution
     /// </summary>
-    public class SessionService
+    public class SessionService: ServiceBase
     {
-        private IEventRepository _eventRepository = new EventRepo();
 
         public async Task<List<Session>> GetAllSessions(bool createNew = true)
         {

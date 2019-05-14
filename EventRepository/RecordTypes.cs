@@ -16,7 +16,7 @@ namespace EventRepository
 
     internal static class RecordTypeConverter
     {
-        internal static string RecordTypeToString(RecordTypes rt)
+        internal static string GetFileName(RecordTypes rt)
         {
             switch (rt)
             {

@@ -7,6 +7,7 @@ namespace EventModels
 
     public class Session : IEventRecord
     {
+
         public int Id { get; set; }
         public DayOfWeek Day { get; set; }
         public string Title { get; set; }
@@ -29,6 +30,11 @@ namespace EventModels
             {
                 return null;
             }
+        }
+
+        public override int GetHashCode()
+        {
+            return Id;
         }
 
     }

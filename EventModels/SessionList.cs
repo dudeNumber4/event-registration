@@ -54,7 +54,7 @@ namespace EventModels
             unchecked
             {
                 var result = 17;
-                this.ForEach(s => result = result * 23 + s.Id);
+                this.ForEach(s => result = result * 23 + s.GetHashCode());
                 return result;
             }
         }

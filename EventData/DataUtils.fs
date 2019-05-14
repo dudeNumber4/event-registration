@@ -24,27 +24,30 @@ module DataUtils =
       with
         | :? System.FieldAccessException -> () // async, tests show create directly after check for existence fails.
 
+  let private getDataFilePath record =
+    match record with
+    | RegistrantRecord r -> Path.Combine(dataDirectory, RecordTypes.registrantFileName)
+    | RegistrationRecord r -> Path.Combine(dataDirectory, RecordTypes.registrationFileName)
+    | SessionRecord r -> Path.Combine(dataDirectory, RecordTypes.sessionFileName)
+    | ItineraryRecord r -> Path.Combine(dataDirectory, RecordTypes.itineraryFileName)
 
   let private addRecord record =
+    let fileName = getDataFilePath record
     match record with
-    | RegistrantRecord r -> let fileName = Path.Combine(dataDirectory, RecordTypes.registrantFileName)
-                            ensureDataFileExists fileName |> ignore
+    | RegistrantRecord r -> ensureDataFileExists fileName |> ignore
                             let id, firstName, LastName, Email, OrgName, Industry = r
                             // sure will be nice when F# gets string interpolation
                             let csv = sprintf "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"%s" id firstName LastName Email OrgName Industry Environment.NewLine
                             File.AppendAllText(fileName, csv) |> ignore
-    | RegistrationRecord r -> let fileName = Path.Combine(dataDirectory, RecordTypes.registrationFileName)
-                              ensureDataFileExists fileName |> ignore
+    | RegistrationRecord r -> ensureDataFileExists fileName |> ignore
                               let id, RegistrantId = r
                               let csv = sprintf "\"%s\",\"%s\"%s" id RegistrantId Environment.NewLine
                               File.AppendAllText(fileName, csv) |> ignore
-    | SessionRecord r -> let fileName = Path.Combine(dataDirectory, RecordTypes.sessionFileName)
-                         ensureDataFileExists fileName |> ignore
+    | SessionRecord r -> ensureDataFileExists fileName |> ignore
                          let id, Day, Title, Description = r
                          let csv = sprintf "\"%s\",\"%s\",\"%s\",\"%s\"%s" id Day Title Description Environment.NewLine
                          File.AppendAllText(fileName, csv) |> ignore
-    | ItineraryRecord r -> let fileName = Path.Combine(dataDirectory, RecordTypes.itineraryFileName)
-                           ensureDataFileExists fileName |> ignore
+    | ItineraryRecord r -> ensureDataFileExists fileName |> ignore
                            let id, registrationId, SessionIds = r
                            let csv = sprintf "\"%s\",\"%s\"," id registrationId
                            // add id list to end of line
@@ -114,7 +117,7 @@ module DataUtils =
       0
 
   // param fileName is one of RecordTypes' file names
-  let private nextId fileName =
+  let public NextId fileName =
     match fileName with
     // You'd think you could match on a value like RecordTypes.RegistrantRecord, but you can't
     | "Registrant.csv" -> getMaxId (Path.Combine(dataDirectory, RecordTypes.registrantFileName)) + 1
@@ -125,7 +128,7 @@ module DataUtils =
 
   // param fileName is one of RecordTypes' file names
   let public AddRecord fileName (list:string List) =
-    let id = (nextId fileName).ToString()
+    let id = (NextId fileName).ToString()
     match fileName with
     // You'd think you could match on a value like RecordTypes.RegistrantRecord, but you can't
     | "Registrant.csv" -> if (list.Length = 5) then
@@ -192,3 +195,10 @@ module DataUtils =
   let public GetAllSessions() =
     let maxId = getMaxId (Path.Combine(dataDirectory, RecordTypes.sessionFileName))
     loadSessions [] 1 maxId
+
+  let public DataFileExists() =
+    let sessionPath = getDataFilePath (EventRegistrationRecord.SessionRecord(("", "", "", "")))
+    let registrationPath = getDataFilePath (EventRegistrationRecord.RegistrationRecord(("", "")))
+    let registrantPath = getDataFilePath (EventRegistrationRecord.RegistrantRecord(("", "", "", "", "", "")))
+    let itineraryPath = getDataFilePath (EventRegistrationRecord.ItineraryRecord(("", "", [])))
+    File.Exists(sessionPath) || File.Exists(registrantPath) || File.Exists(registrationPath) || File.Exists(itineraryPath)

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using EventRepo = EventRepository.EventRepository;
 
 namespace UnitTests
 {
@@ -18,12 +19,16 @@ namespace UnitTests
 
         private static object _lock = new object();
         internal const string FIRST_RECORD_ID = "1";
-        private static IEventRepository _eventRepository;
+        private static EventRepo _eventRepository;
 
         [ClassInitialize]
         public static void ClassInit(TestContext tc)
         {
             _eventRepository = new EventRepository.EventRepository();
+            if (_eventRepository.DataFileExists())
+            {
+                throw new Exception("A data file already exists in root of solution");
+            }
         }
 
         [ClassCleanup]
@@ -38,13 +43,76 @@ namespace UnitTests
         [TestMethod]
         public void GetAllSessions()
         {
-            Task.WaitAll(new Task[] { _eventRepository.AddRecord(RecordTypes.Session, GetEnumerableDataFor(RecordTypes.Session)) });
-            Task.WaitAll(new Task[] { _eventRepository.AddRecord(RecordTypes.Session, GetEnumerableDataFor(RecordTypes.Session)) });
-            List<Session> result = _eventRepository.GetAllSessions().Result;
-            Assert.AreEqual(2, result.Count);
-            ValidateEventRecord(result[0], RecordTypes.Session);
-            ValidateEventRecord(result[1], RecordTypes.Session);
-            Assert.AreNotEqual(result[0].Id, result[1].Id);
+            lock (_lock)
+            {
+                Task.WaitAll(new Task[] { _eventRepository.AddRecord(RecordTypes.Session, GetEnumerableDataFor(RecordTypes.Session)) });
+                Task.WaitAll(new Task[] { _eventRepository.AddRecord(RecordTypes.Session, GetEnumerableDataFor(RecordTypes.Session)) });
+                List<Session> result = _eventRepository.GetAllSessions().Result;
+                Assert.AreEqual(2, result.Count);
+                ValidateEventRecord(result[0], RecordTypes.Session);
+                ValidateEventRecord(result[1], RecordTypes.Session);
+                Assert.AreNotEqual(result[0].Id, result[1].Id);
+            }
+        }
+
+        [TestMethod]
+        //[DataRow(RecordTypes.Registrant)]
+        //[DataRow(RecordTypes.Registration)]
+        [DataRow(RecordTypes.Itinerary)]
+        public void AddConcreteTypes(RecordTypes rt)
+        {
+            lock (_lock)
+            {
+                // add record of the given type
+                Task.WaitAll(new Task[] { _eventRepository.AddRecord(rt, GetEnumerableDataFor(rt)) });
+
+                // retrieve by id (should have fresh ids)
+                var eventRecord = GetEventRecord(rt);
+                Assert.IsNotNull(eventRecord);
+
+                // change id and save it as a typed object.
+                eventRecord.Id += 1;
+
+                void AddNewRegistrant() => _eventRepository.AddRecord(RecordTypes.Registrant, GetEnumerableDataFor(RecordTypes.Registrant)).Wait();
+                void AddNewRegistration()
+                {
+                    AddNewRegistrant();
+                    var registrantRecord = GetEventRecord(RecordTypes.Registrant);
+                    var registration = new Registration
+                    {
+                        Id = _eventRepository.NextId(RecordTypes.Registration),
+                        RegistrantId = registrantRecord.Id
+                    };
+                    _eventRepository.AddRegistration(registration).Wait();
+                }
+
+                switch (rt)
+                {
+                    case RecordTypes.Itinerary:
+                        // RESUME: test itinerary.
+                        // must first add related registrant, registration
+                        AddNewRegistration();
+                        var registrationRecord = GetEventRecord(RecordTypes.Registrant);
+                        var i = eventRecord as Itinerary;
+                        i.RegistrationId = registrationRecord.Id;
+                        Assert.IsTrue(_eventRepository.AddItinerary(i).Result);
+                        break;
+                    case RecordTypes.Registrant:
+                        _eventRepository.AddRegistrant(eventRecord as Registrant).Wait();
+                        break;
+                    case RecordTypes.Registration:
+                        _eventRepository.AddRegistration(eventRecord as Registration).Wait();
+                        break;
+                    case RecordTypes.Session:
+                        throw new NotImplementedException($"No method to test for add {nameof(Session)}");
+                    default:
+                        throw new NotImplementedException(rt.ToString());
+                }
+
+                // retrieve it; ensure it was saved correctly
+                eventRecord = GetEventRecord(rt, eventRecord.Id.ToString());
+                ValidateEventRecord(eventRecord, rt);
+            }
         }
 
         [TestMethod]
@@ -54,22 +122,25 @@ namespace UnitTests
         [DataRow(RecordTypes.Itinerary)]
         public void ProcessRecord(RecordTypes rt)
         {
-            // add 2 records of the given type
-            Task.WaitAll(new Task[] { _eventRepository.AddRecord(rt, GetEnumerableDataFor(rt)) });
-            Task.WaitAll(new Task[] { _eventRepository.AddRecord(rt, GetEnumerableDataFor(rt)) });
+            lock (_lock)
+            {
+                // add 2 records of the given type
+                Task.WaitAll(new Task[] { _eventRepository.AddRecord(rt, GetEnumerableDataFor(rt)) });
+                Task.WaitAll(new Task[] { _eventRepository.AddRecord(rt, GetEnumerableDataFor(rt)) });
 
-            // retrieve by id (should have fresh ids)
-            var eventRecord = GetEventRecord(rt);
-            Assert.IsNotNull(eventRecord);
-            Assert.AreEqual(int.Parse(FIRST_RECORD_ID), eventRecord.Id);
-            ValidateEventRecord(eventRecord, rt);
+                // retrieve by id (should have fresh ids)
+                var eventRecord = GetEventRecord(rt);
+                Assert.IsNotNull(eventRecord);
+                Assert.AreEqual(int.Parse(FIRST_RECORD_ID), eventRecord.Id);
+                ValidateEventRecord(eventRecord, rt);
 
-            // delete
-            Task.WaitAll(new Task[] { _eventRepository.DeleteRecord(FIRST_RECORD_ID, rt) });
+                // delete
+                Task.WaitAll(new Task[] { _eventRepository.DeleteRecord(FIRST_RECORD_ID, rt) });
 
-            // retrieve nothing
-            eventRecord = GetEventRecord(rt);
-            Assert.IsNull(eventRecord);
+                // retrieve nothing
+                eventRecord = GetEventRecord(rt);
+                Assert.IsNull(eventRecord);
+            }
         }
 
         [TestMethod]
@@ -100,6 +171,18 @@ namespace UnitTests
             }
         }
 
+        [TestMethod]
+        public void GetNextId()
+        {
+            lock (_lock)
+            {
+                Task.WaitAll(new Task[] { _eventRepository.AddRecord(RecordTypes.Session, GetEnumerableDataFor(RecordTypes.Session)) });
+                List<Session> result = _eventRepository.GetAllSessions().Result;
+                var nextId = _eventRepository.NextId(RecordTypes.Session);
+                Assert.IsTrue(nextId == result.Count() + 1);
+            }
+        }
+
         void ValidateEventRecord(IEventRecord eventRecord, RecordTypes rt)
         {
             switch (rt)
@@ -122,7 +205,7 @@ namespace UnitTests
             }
         }
 
-        private IEventRecord GetEventRecord(RecordTypes rt)
+        private IEventRecord GetEventRecord(RecordTypes rt, string id = FIRST_RECORD_ID)
         {
             IEventRecord result = null;
             switch (rt)
@@ -130,16 +213,16 @@ namespace UnitTests
                 // When I had the code simply return what result is set to below, it was always null.
                 // This even though .Result is a blocking call.  Something extremely screwy with the task system going on there.
                 case RecordTypes.Itinerary:
-                    result = _eventRepository.GetItinerary(FIRST_RECORD_ID).Result;
+                    result = _eventRepository.GetItinerary(id).Result;
                     break;
                 case RecordTypes.Registrant:
-                    result = _eventRepository.GetRegistrant(FIRST_RECORD_ID).Result;
+                    result = _eventRepository.GetRegistrant(id).Result;
                     break;
                 case RecordTypes.Registration:
-                    result = _eventRepository.GetRegistration(FIRST_RECORD_ID).Result;
+                    result = _eventRepository.GetRegistration(id).Result;
                     break;
                 case RecordTypes.Session:
-                    result = _eventRepository.GetSession(FIRST_RECORD_ID).Result;
+                    result = _eventRepository.GetSession(id).Result;
                     break;
                 default:
                     return null;
