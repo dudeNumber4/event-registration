@@ -56,45 +56,54 @@ namespace UnitTests
         }
 
         [TestMethod]
-        //[DataRow(RecordTypes.Registrant)]
-        //[DataRow(RecordTypes.Registration)]
+        [DataRow(RecordTypes.Registrant)]
+        [DataRow(RecordTypes.Registration)]
+        [DataRow(RecordTypes.Session)]
         [DataRow(RecordTypes.Itinerary)]
         public void AddConcreteTypes(RecordTypes rt)
         {
             lock (_lock)
             {
+                // All the helper functions are for itinerary; the thing that needs all the others.
+                void AddRecord(RecordTypes recordType)
+                {
+                    Task.WaitAll(new Task[] { _eventRepository.AddRecord(recordType, GetEnumerableDataFor(recordType)) });
+                }
+
                 // add record of the given type
-                Task.WaitAll(new Task[] { _eventRepository.AddRecord(rt, GetEnumerableDataFor(rt)) });
+                AddRecord(rt);
 
                 // retrieve by id (should have fresh ids)
                 var eventRecord = GetEventRecord(rt);
                 Assert.IsNotNull(eventRecord);
 
-                // change id and save it as a typed object.
-                eventRecord.Id += 1;
-
+                void AddNewSession()
+                {
+                    AddRecord(RecordTypes.Session);
+                    _eventRepository.AddSession(GetEventRecord(RecordTypes.Session) as Session).Wait();
+                }
                 void AddNewRegistrant() => _eventRepository.AddRecord(RecordTypes.Registrant, GetEnumerableDataFor(RecordTypes.Registrant)).Wait();
                 void AddNewRegistration()
                 {
                     AddNewRegistrant();
                     var registrantRecord = GetEventRecord(RecordTypes.Registrant);
-                    var registration = new Registration
-                    {
-                        Id = _eventRepository.NextId(RecordTypes.Registration),
-                        RegistrantId = registrantRecord.Id
-                    };
+                    var registration = new Registration { RegistrantId = registrantRecord.Id };
                     _eventRepository.AddRegistration(registration).Wait();
                 }
 
+                // Save it as a new typed object.
                 switch (rt)
                 {
                     case RecordTypes.Itinerary:
-                        // RESUME: test itinerary.
-                        // must first add related registrant, registration
+                        // must first add related registrant, registration, session, all the things.
+                        AddNewSession();
                         AddNewRegistration();
                         var registrationRecord = GetEventRecord(RecordTypes.Registrant);
                         var i = eventRecord as Itinerary;
                         i.RegistrationId = registrationRecord.Id;
+                        var sessionRecord = GetEventRecord(RecordTypes.Session);
+                        Assert.IsNotNull(i.SessionList);
+                        i.SessionList.Add(sessionRecord as Session);
                         Assert.IsTrue(_eventRepository.AddItinerary(i).Result);
                         break;
                     case RecordTypes.Registrant:
@@ -104,7 +113,8 @@ namespace UnitTests
                         _eventRepository.AddRegistration(eventRecord as Registration).Wait();
                         break;
                     case RecordTypes.Session:
-                        throw new NotImplementedException($"No method to test for add {nameof(Session)}");
+                        AddNewSession();
+                        break;
                     default:
                         throw new NotImplementedException(rt.ToString());
                 }
@@ -171,17 +181,17 @@ namespace UnitTests
             }
         }
 
-        [TestMethod]
-        public void GetNextId()
-        {
-            lock (_lock)
-            {
-                Task.WaitAll(new Task[] { _eventRepository.AddRecord(RecordTypes.Session, GetEnumerableDataFor(RecordTypes.Session)) });
-                List<Session> result = _eventRepository.GetAllSessions().Result;
-                var nextId = _eventRepository.NextId(RecordTypes.Session);
-                Assert.IsTrue(nextId == result.Count() + 1);
-            }
-        }
+        //[TestMethod]
+        //public void GetNextId()
+        //{
+        //    lock (_lock)
+        //    {
+        //        Task.WaitAll(new Task[] { _eventRepository.AddRecord(RecordTypes.Session, GetEnumerableDataFor(RecordTypes.Session)) });
+        //        List<Session> result = _eventRepository.GetAllSessions().Result;
+        //        var nextId = _eventRepository.NextId(RecordTypes.Session);
+        //        Assert.IsTrue(nextId == result.Count() + 1);
+        //    }
+        //}
 
         void ValidateEventRecord(IEventRecord eventRecord, RecordTypes rt)
         {

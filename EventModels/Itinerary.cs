@@ -14,7 +14,7 @@ namespace EventModels
 
         public int Id { get; set; }
         public int RegistrationId { get; set; }
-        public SessionList SessionList { get; set; }
+        public SessionList SessionList { get; set; } = new SessionList();
         public List<int> SessionIds { get; set; }
 
         /// <summary>

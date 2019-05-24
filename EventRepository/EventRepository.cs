@@ -29,10 +29,11 @@ namespace EventRepository
             await Task.Run(() => DataUtils.AddRecord(RecordTypeConverter.GetFileName(rt), ListModule.OfSeq(fileContents)));
         }
 
-        public int NextId(RecordTypes rt)
-        {
-            return DataUtils.NextId(RecordTypeConverter.GetFileName(rt));
-        }
+        // DataUtil generates the next id
+        //public int NextId(RecordTypes rt)
+        //{
+        //    return DataUtils.NextId(RecordTypeConverter.GetFileName(rt));
+        //}
 
         /// <summary>
         /// 
@@ -45,7 +46,7 @@ namespace EventRepository
             Debug.Assert(i.RegistrationId > 0);
             IEnumerable<string> ItineraryContents()
             {
-                yield return i.Id.ToString();
+                //yield return i.Id.ToString(); database generates this
                 yield return i.RegistrationId.ToString();
                 foreach (var session in i.SessionList)
                 {
@@ -68,7 +69,7 @@ namespace EventRepository
         {
             IEnumerable<string> RegistrationContents()
             {
-                yield return r.Id.ToString();
+                //yield return r.Id.ToString(); database generates this
                 yield return r.RegistrantId.ToString();
             }
             await AddRecord(RecordTypes.Registration, RegistrationContents());
@@ -78,7 +79,7 @@ namespace EventRepository
         {
             IEnumerable<string> RegistrantContents()
             {
-                yield return r.Id.ToString();
+                //yield return r.Id.ToString(); database generates this
                 yield return r.PersonalInfo?.FirstName;
                 yield return r.PersonalInfo?.LastName;
                 yield return r.PersonalInfo?.Email;
@@ -86,6 +87,17 @@ namespace EventRepository
                 yield return r.EmploymentInfo?.Industry;
             }
             await AddRecord(RecordTypes.Registrant, RegistrantContents());
+        }
+
+        public async Task AddSession(Session s)
+        {
+            IEnumerable<string> SessionContents()
+            {
+                yield return ((int)s.Day).ToString();
+                yield return s.Title;
+                yield return s.Description;
+            }
+            await AddRecord(RecordTypes.Session, SessionContents());
         }
 
         /// <summary>

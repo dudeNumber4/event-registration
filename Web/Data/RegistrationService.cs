@@ -12,11 +12,11 @@ namespace EventRegistration.Data
     public class RegistrationService : ServiceBase
     {
 
-        public async Task<int> AddRegistration(Registration registration)
-        {
-            var nextId = _eventRepository.NextId(RecordTypes.Registration);
+        //public async Task<int> AddRegistration(Registration registration)
+        //{
+        //    var nextId = _eventRepository.NextId(RecordTypes.Registration);
 
-        }
+        //}
 
     }
 

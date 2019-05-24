@@ -117,7 +117,7 @@
           "buildMultiTargeting/Microsoft.NET.Test.Sdk.props": {}
         }
       },
-      "Microsoft.NETCore.Platforms/3.0.0-preview4.19212.13": {
+      "Microsoft.NETCore.Platforms/3.0.0-preview5.19224.8": {
         "type": "package",
         "compile": {
           "lib/netstandard1.0/_._": {}
@@ -2073,7 +2073,10 @@
         },
         "runtime": {
           "bin/placeholder/EventData.dll": {}
-        }
+        },
+        "frameworkReferences": [
+          "Microsoft.NETCore.App"
+        ]
       },
       "EventModels/1.0.0": {
         "type": "project",
@@ -2086,7 +2089,10 @@
         },
         "runtime": {
           "bin/placeholder/EventModels.dll": {}
-        }
+        },
+        "frameworkReferences": [
+          "Microsoft.NETCore.App"
+        ]
       },
       "EventRepository/1.0.0": {
         "type": "project",
@@ -2100,7 +2106,10 @@
         },
         "runtime": {
           "bin/placeholder/EventRepository.dll": {}
-        }
+        },
+        "frameworkReferences": [
+          "Microsoft.NETCore.App"
+        ]
       }
     }
   },
@@ -2237,17 +2246,17 @@
         "microsoft.net.test.sdk.nuspec"
       ]
     },
-    "Microsoft.NETCore.Platforms/3.0.0-preview4.19212.13": {
-      "sha512": "cBcFp3iIi/c6AK9F/aZxbZaNhWGOLSJD071L9tO8JbyODp38NDKsJ38Xq/KJUCt1EUIlqnyF6PdqOngFuCvD1Q==",
+    "Microsoft.NETCore.Platforms/3.0.0-preview5.19224.8": {
+      "sha512": "MEt1XzSndofi4WBoGaRcMZdy9rqNtZITVZev2PTtXizcNe4csoN7U638Q73M93I/LxroBAI1IB+6HQOuklkKrw==",
       "type": "package",
-      "path": "microsoft.netcore.platforms/3.0.0-preview4.19212.13",
+      "path": "microsoft.netcore.platforms/3.0.0-preview5.19224.8",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "LICENSE.TXT",
         "THIRD-PARTY-NOTICES.TXT",
         "lib/netstandard1.0/_._",
-        "microsoft.netcore.platforms.3.0.0-preview4.19212.13.nupkg.sha512",
+        "microsoft.netcore.platforms.3.0.0-preview5.19224.8.nupkg.sha512",
         "microsoft.netcore.platforms.nuspec",
         "runtime.json",
         "useSharedDesignerContext.txt",
@@ -2260,7 +2269,6 @@
       "path": "microsoft.netcore.targets/1.1.0",
       "files": [
         ".nupkg.metadata",
-        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/netstandard1.0/_._",
@@ -2829,6 +2837,7 @@
       "path": "runtime.native.system.net.http/4.3.0",
       "files": [
         ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/netstandard1.0/_._",
@@ -2855,6 +2864,7 @@
       "path": "runtime.native.system.security.cryptography.openssl/4.3.0",
       "files": [
         ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/netstandard1.0/_._",
@@ -3026,7 +3036,6 @@
       "path": "system.buffers/4.3.0",
       "files": [
         ".nupkg.metadata",
-        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/netstandard1.1/.xml",
@@ -3175,7 +3184,6 @@
       "path": "system.collections.immutable/1.2.0",
       "files": [
         ".nupkg.metadata",
-        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/netstandard1.0/System.Collections.Immutable.dll",
@@ -4110,6 +4118,7 @@
       "path": "system.io/4.3.0",
       "files": [
         ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/MonoAndroid10/_._",
@@ -4923,7 +4932,6 @@
       "path": "system.reflection.emit.ilgeneration/4.3.0",
       "files": [
         ".nupkg.metadata",
-        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/MonoAndroid10/_._",
@@ -4968,6 +4976,7 @@
       "path": "system.reflection.emit.lightweight/4.3.0",
       "files": [
         ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/MonoAndroid10/_._",
@@ -5068,7 +5077,6 @@
       "path": "system.reflection.metadata/1.3.0",
       "files": [
         ".nupkg.metadata",
-        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/netstandard1.1/System.Reflection.Metadata.dll",
@@ -5250,6 +5258,7 @@
       "path": "system.runtime/4.3.0",
       "files": [
         ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/MonoAndroid10/_._",
@@ -5723,7 +5732,6 @@
       "path": "system.runtime.serialization.primitives/4.1.1",
       "files": [
         ".nupkg.metadata",
-        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/MonoAndroid10/_._",
@@ -5796,6 +5804,7 @@
       "path": "system.security.cryptography.algorithms/4.3.0",
       "files": [
         ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/MonoAndroid10/_._",
@@ -5894,6 +5903,7 @@
       "path": "system.security.cryptography.encoding/4.3.0",
       "files": [
         ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/MonoAndroid10/_._",
@@ -5949,6 +5959,7 @@
       "path": "system.security.cryptography.primitives/4.3.0",
       "files": [
         ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/MonoAndroid10/_._",
@@ -5977,6 +5988,7 @@
       "path": "system.security.cryptography.x509certificates/4.3.0",
       "files": [
         ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/MonoAndroid10/_._",
@@ -6402,6 +6414,7 @@
       "path": "system.threading.thread/4.0.0",
       "files": [
         ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/MonoAndroid10/_._",
@@ -6782,6 +6795,7 @@
       "path": "system.xml.xpath/4.0.1",
       "files": [
         ".nupkg.metadata",
+        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/MonoAndroid10/_._",
@@ -6874,27 +6888,27 @@
       "MSTest.TestAdapter >= 2.0.0-beta4",
       "MSTest.TestFramework >= 2.0.0-beta4",
       "Microsoft.NET.Test.Sdk >= 16.0.1",
-      "Microsoft.NETCore.Platforms >= 3.0.0-preview4.19212.13"
+      "Microsoft.NETCore.Platforms >= 3.0.0-preview5.19224.8"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Brad Wood\\.nuget\\packages\\": {},
+    "C:\\Users\\BradWood\\.nuget\\packages\\": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Data\\SideProjects\\event-registration\\UnitTests\\UnitTests.csproj",
+      "projectUniqueName": "C:\\SideProjects\\event-registration\\UnitTests\\UnitTests.csproj",
       "projectName": "UnitTests",
-      "projectPath": "C:\\Data\\SideProjects\\event-registration\\UnitTests\\UnitTests.csproj",
-      "packagesPath": "C:\\Users\\Brad Wood\\.nuget\\packages\\",
-      "outputPath": "C:\\Data\\SideProjects\\event-registration\\UnitTests\\obj\\",
+      "projectPath": "C:\\SideProjects\\event-registration\\UnitTests\\UnitTests.csproj",
+      "packagesPath": "C:\\Users\\BradWood\\.nuget\\packages\\",
+      "outputPath": "C:\\SideProjects\\event-registration\\UnitTests\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\Brad Wood\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\BradWood\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -6903,7 +6917,6 @@
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {},
-        "https://choicescreening.pkgs.visualstudio.com/_packaging/ChoiceScreening/nuget/v3/index.json": {},
         "https://dotnetfeed.blob.core.windows.net/aspnet-aspnetcore-tooling/index.json": {},
         "https://dotnetfeed.blob.core.windows.net/aspnet-aspnetcore/index.json": {},
         "https://dotnetfeed.blob.core.windows.net/aspnet-entityframeworkcore/index.json": {},
@@ -6914,11 +6927,11 @@
       "frameworks": {
         "netcoreapp3.0": {
           "projectReferences": {
-            "C:\\Data\\SideProjects\\event-registration\\EventModels\\EventModels.csproj": {
-              "projectPath": "C:\\Data\\SideProjects\\event-registration\\EventModels\\EventModels.csproj"
+            "C:\\SideProjects\\event-registration\\EventModels\\EventModels.csproj": {
+              "projectPath": "C:\\SideProjects\\event-registration\\EventModels\\EventModels.csproj"
             },
-            "C:\\Data\\SideProjects\\event-registration\\EventRepository\\EventRepository.csproj": {
-              "projectPath": "C:\\Data\\SideProjects\\event-registration\\EventRepository\\EventRepository.csproj"
+            "C:\\SideProjects\\event-registration\\EventRepository\\EventRepository.csproj": {
+              "projectPath": "C:\\SideProjects\\event-registration\\EventRepository\\EventRepository.csproj"
             }
           }
         }
@@ -6947,7 +6960,7 @@
           "Microsoft.NETCore.Platforms": {
             "suppressParent": "All",
             "target": "Package",
-            "version": "[3.0.0-preview4.19212.13, )",
+            "version": "[3.0.0-preview5.19224.8, )",
             "autoReferenced": true
           }
         },
@@ -6955,7 +6968,10 @@
           "net461"
         ],
         "assetTargetFallback": true,
-        "warn": true
+        "warn": true,
+        "frameworkReferences": [
+          "Microsoft.NETCore.App"
+        ]
       }
     }
   }
