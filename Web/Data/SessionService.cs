@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using EventModels;
 using EventRepository;
-using EventRepo = EventRepository.EventRepository;
 
 namespace EventRegistration.Data
 {
@@ -27,8 +26,7 @@ namespace EventRegistration.Data
         }
 
         /// <summary>
-        /// RESUME (this doesn't make sense now): Let's get this calling through to the client with the type.
-        /// Prolly, we'll want to post up with the type and have that go through as is to the repository.  Which means the repo will have to change those from records to types as well.
+        /// 
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>

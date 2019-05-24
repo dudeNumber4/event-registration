@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using EventModels;
 using EventRepository;
-using EventRepo = EventRepository.EventRepository;
 
 namespace EventRegistration.Data
 {
@@ -14,7 +13,6 @@ namespace EventRegistration.Data
 
         //public async Task<int> AddRegistration(Registration registration)
         //{
-        //    var nextId = _eventRepository.NextId(RecordTypes.Registration);
 
         //}
 
