@@ -30,6 +30,15 @@ namespace EventModels
             }
         }
 
+        public Itinerary GetItinerary(SessionList sessionList)
+        {
+            return new Itinerary
+            {
+                RegistrationId = Id,
+                SessionList = sessionList
+            };
+        }
+
     }
 
 }

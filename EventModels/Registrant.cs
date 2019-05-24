@@ -7,6 +7,7 @@ namespace EventModels
 
     public class Registrant : IEventRecord
     {
+
         public int Id { get; set; }
         public Personal PersonalInfo { get; set; }
         public Employment EmploymentInfo { get; set; }
@@ -27,6 +28,15 @@ namespace EventModels
             {
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Registrant becomes registration upon signature.
+        /// </summary>
+        /// <returns></returns>
+        public Registration Sign()
+        {
+            return new Registration { RegistrantId = Id };
         }
 
     }

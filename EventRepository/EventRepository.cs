@@ -19,6 +19,32 @@ namespace EventRepository
 
         public bool DataFileExists() => DataUtils.DataFileExists();
 
+        public async Task UpdateRecord(IEventRecord eventRecord, RecordTypes rt)
+        {
+            if (eventRecord == null)
+            {
+                return;
+            }
+            else
+            {
+                var existing = await GetRecord(eventRecord.Id.ToString(), rt);
+                if (existing.Any())
+                {
+                    await DeleteRecord(eventRecord.Id.ToString(), rt);
+                }
+
+
+                // resume here; don't think switch expressions work yet.
+                //Task x = rt switch
+                //{
+                //    RecordTypes.Itinerary => await AddRecord(RecordTypes.Itinerary, ItineraryContents(eventRecord as Itinerary)),
+                //    RecordTypes.Session => await AddRecord(RecordTypes.Session, SessionContents(eventRecord as Session)),
+                //    RecordTypes.Registration => await AddRecord(RecordTypes.Registration, RegistrationContents(eventRecord as Registration)),
+                //    RecordTypes.Registrant => await AddRecord(RecordTypes.Registrant, RegistrantContents(eventRecord as Registrant))
+                //};
+            }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -29,12 +55,6 @@ namespace EventRepository
             await Task.Run(() => DataUtils.AddRecord(RecordTypeConverter.GetFileName(rt), ListModule.OfSeq(fileContents)));
         }
 
-        // DataUtil generates the next id
-        //public int NextId(RecordTypes rt)
-        //{
-        //    return DataUtils.NextId(RecordTypeConverter.GetFileName(rt));
-        //}
-
         /// <summary>
         /// 
         /// </summary>
@@ -44,15 +64,6 @@ namespace EventRepository
         {
             Debug.Assert(i != null);
             Debug.Assert(i.RegistrationId > 0);
-            IEnumerable<string> ItineraryContents()
-            {
-                //yield return i.Id.ToString(); database generates this
-                yield return i.RegistrationId.ToString();
-                foreach (var session in i.SessionList)
-                {
-                    yield return session.Id.ToString();
-                }
-            }
             var registration = await GetRecord(i.RegistrationId.ToString(), RecordTypes.Registration);
             if (!registration.Any())
             {
@@ -60,44 +71,24 @@ namespace EventRepository
             }
             else
             {
-                await AddRecord(RecordTypes.Itinerary, ItineraryContents());
+                await AddRecord(RecordTypes.Itinerary, ItineraryContents(i));
                 return await Task.FromResult(true);
             }
         }
 
         public async Task AddRegistration(Registration r)
         {
-            IEnumerable<string> RegistrationContents()
-            {
-                //yield return r.Id.ToString(); database generates this
-                yield return r.RegistrantId.ToString();
-            }
-            await AddRecord(RecordTypes.Registration, RegistrationContents());
+            await AddRecord(RecordTypes.Registration, RegistrationContents(r));
         }
 
         public async Task AddRegistrant(Registrant r)
         {
-            IEnumerable<string> RegistrantContents()
-            {
-                //yield return r.Id.ToString(); database generates this
-                yield return r.PersonalInfo?.FirstName;
-                yield return r.PersonalInfo?.LastName;
-                yield return r.PersonalInfo?.Email;
-                yield return r.EmploymentInfo?.OrgName;
-                yield return r.EmploymentInfo?.Industry;
-            }
-            await AddRecord(RecordTypes.Registrant, RegistrantContents());
+            await AddRecord(RecordTypes.Registrant, RegistrantContents(r));
         }
 
         public async Task AddSession(Session s)
         {
-            IEnumerable<string> SessionContents()
-            {
-                yield return ((int)s.Day).ToString();
-                yield return s.Title;
-                yield return s.Description;
-            }
-            await AddRecord(RecordTypes.Session, SessionContents());
+            await AddRecord(RecordTypes.Session, SessionContents(s));
         }
 
         /// <summary>
@@ -146,11 +137,6 @@ namespace EventRepository
             return new Registration().FromBasicRecord(record) as Registration;
         }
 
-        //public async Task<int> AddRegistration(Registration r)
-        //{
-        //    var id = DataUtils.get
-        //}
-
         public async Task<Registrant> GetRegistrant(string id)
         {
             var record = await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id, RecordTypeConverter.GetFileName(RecordTypes.Registrant))));
@@ -194,6 +180,39 @@ namespace EventRepository
         {
             IEnumerable<string> enumerable = SeqModule.OfList(list);
             return new List<string>(enumerable);
+        }
+
+        private IEnumerable<string> ItineraryContents(Itinerary i)
+        {
+            //yield return i.Id.ToString(); database generates this
+            yield return i.RegistrationId.ToString();
+            foreach (var session in i.SessionList)
+            {
+                yield return session.Id.ToString();
+            }
+        }
+
+        private IEnumerable<string> RegistrationContents(Registration r)
+        {
+            //yield return r.Id.ToString(); database generates this
+            yield return r.RegistrantId.ToString();
+        }
+
+        private IEnumerable<string> RegistrantContents(Registrant r)
+        {
+            //yield return r.Id.ToString(); database generates this
+            yield return r.PersonalInfo?.FirstName;
+            yield return r.PersonalInfo?.LastName;
+            yield return r.PersonalInfo?.Email;
+            yield return r.EmploymentInfo?.OrgName;
+            yield return r.EmploymentInfo?.Industry;
+        }
+
+        private IEnumerable<string> SessionContents(Session s)
+        {
+            yield return ((int)s.Day).ToString();
+            yield return s.Title;
+            yield return s.Description;
         }
 
     }
