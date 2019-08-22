@@ -1,6 +1,7 @@
 ﻿@page "/sessions"
 @using EventRegistration.Data
 @using EventModels
+@using System.Diagnostics
 @inject SessionService SessionService
 
 @if (sessions == null)
@@ -22,7 +23,7 @@ else
             @foreach (var session in sessions)
             {
                 <tr>
-                    <td><button class="btn btn-primary" onclick="@(e => DeleteSession(e, session.Id))">Delete Session</button></td>
+                    <td><button class="btn btn-primary" @onclick="e => DeleteSession(e, session.Id)">Delete Session</button></td>
                     <td>@session.Day</td>
                     <td>@session.Title</td>
                     <td>@session.Description</td>
@@ -31,15 +32,14 @@ else
         </tbody>
     </table>
     <div>
-        <button class="btn btn-primary" onclick="@(e => DeleteAll(e))">Delete all Sessions</button>
+        <button class="btn btn-primary" @onclick="(e => DeleteAll(e))">Delete all Sessions</button>
     </div>
 }
 
-
-@functions {
+@code {
     List<Session> sessions;
 
-    protected override async Task OnInitAsync()
+    protected override async Task OnInitializedAsync()
     {
         await LoadSessions(true);
     }
@@ -61,5 +61,4 @@ else
     {
         sessions = await SessionService.GetAllSessions(createNew);
     }
-
 }
