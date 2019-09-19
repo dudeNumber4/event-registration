@@ -27,24 +27,34 @@ namespace EventRepository
             }
             else
             {
+                // Delete and re-add
                 var existing = await GetRecord(eventRecord.Id.ToString(), rt);
                 if (existing.Any())
                 {
                     await DeleteRecord(eventRecord.Id.ToString(), rt);
                 }
 
-
-                // resume here; don't think switch expressions work yet.
-                //Task x = rt switch
-                //{
-                //    RecordTypes.Itinerary => await AddRecord(RecordTypes.Itinerary, ItineraryContents(eventRecord as Itinerary)),
-                //    RecordTypes.Session => await AddRecord(RecordTypes.Session, SessionContents(eventRecord as Session)),
-                //    RecordTypes.Registration => await AddRecord(RecordTypes.Registration, RegistrationContents(eventRecord as Registration)),
-                //    RecordTypes.Registrant => await AddRecord(RecordTypes.Registrant, RegistrantContents(eventRecord as Registrant))
-                //};
+                // You'd think you could use switch expressions, but not when calling a method.
+                switch (rt)
+                {
+                    case RecordTypes.Itinerary:
+                        await AddRecord(RecordTypes.Itinerary, ItineraryContents(eventRecord as Itinerary));
+                        break;
+                    case RecordTypes.Registrant:
+                        await AddRecord(RecordTypes.Session, SessionContents(eventRecord as Session));
+                        break;
+                    case RecordTypes.Registration:
+                        await AddRecord(RecordTypes.Registration, RegistrationContents(eventRecord as Registration));
+                        break;
+                    case RecordTypes.Session:
+                        await AddRecord(RecordTypes.Registrant, RegistrantContents(eventRecord as Registrant));
+                        break;
+                    default:
+                        break;
+                }
             }
         }
-
+        
         /// <summary>
         /// 
         /// </summary>

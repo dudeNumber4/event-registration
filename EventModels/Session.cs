@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace EventModels
@@ -10,7 +11,10 @@ namespace EventModels
 
         public int Id { get; set; }
         public DayOfWeek Day { get; set; }
+        [Required]
+        [StringLength(50, ErrorMessage = "Title is too long.")]
         public string Title { get; set; }
+        [StringLength(1024, ErrorMessage = "Description is too long.")]
         public string Description { get; set; }
 
         public IEventRecord FromBasicRecord(List<string> record)

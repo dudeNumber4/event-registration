@@ -22,35 +22,51 @@ else
         <tbody>
             @foreach (var session in sessions)
             {
-                <tr>
-                    <td><button class="btn btn-primary" @onclick="e => DeleteSession(e, session.Id)">Delete Session</button></td>
-                    <td>@session.Day</td>
-                    <td>@session.Title</td>
-                    <td>@session.Description</td>
-                </tr>
+            <tr>
+                <td><button class="btn btn-primary" @onclick="e => DeleteSession(e, session.Id)">Delete Session</button></td>
+                <td>@session.Day</td>
+                <td>@session.Title</td>
+                <td>@session.Description</td>
+                @*You caint use the plain attribute data-toggle way*@
+                @* HtmlHelper.InvokeComponent or something like that *@
+                @*(await Html.RenderComponentAsync()) href="/SimpleSessionForm/@session.Id.ToString()"*@
+                @*<td><button class="btn btn-primary btn-sm" @onclick="e => await Html.RenderComponentAsync<SimpleSessionForm>(session.Id)">Edit</button></td>*@
+                @*<td><button class="btn btn-primary btn-sm" @onclick="e => EditSession(e, session.Id)">Edit</button></td>*@
+            </tr>
             }
         </tbody>
     </table>
     <div>
-        <button class="btn btn-primary" @onclick="(e => DeleteAll(e))">Delete all Sessions</button>
+        <button class="btn btn-primary" @onclick="DeleteAll">Delete all Sessions</button>
     </div>
 }
 
 @code {
     List<Session> sessions;
+    int editSessionId = 0;
 
     protected override async Task OnInitializedAsync()
     {
         await LoadSessions(true);
     }
 
-    async Task DeleteAll(UIMouseEventArgs e)
+    async Task DeleteAll(MouseEventArgs e)
     {
         await SessionService.DeleteAllSessions();
         await LoadSessions(false);
     }
 
-    async Task DeleteSession(UIMouseEventArgs e, int id)
+    void EditSession(MouseEventArgs e, int id)
+    {
+        // RESUME: https://stackoverflow.com/questions/57733416/cant-render-blazor-component
+        // resume in sample project
+        // Back in other sample project; this is very hard.
+        //Microsoft.AspNetCore.Html.
+        //HtmlRenderer.r
+        //await Html.RenderComponentAsync<SimpleSessionForm>(id.ToString());
+    }
+
+    async Task DeleteSession(MouseEventArgs e, int id)
     {
         await SessionService.DeleteSession(id);
         // Note that each time I call this, something is watching it (not sure how that mechanism works), and the UI is updated

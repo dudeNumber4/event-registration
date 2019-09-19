@@ -1,0 +1,32 @@
+﻿@page "/SimpleSessionForm/{SessionId}"
+@using EventRegistration.Data
+@using EventModels
+@inject SessionService SessionService
+
+<h3>Edit Session</h3>
+<EditForm Model="@session" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <InputText id="title" @bind -Value="@session.Title" />
+
+    <button type="submit">Submit</button>
+</EditForm>
+
+@code {
+    public Session session { get; set; } // must get from service
+
+    [Parameter] // this attribute means url parameter
+    public string SessionId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        session = await SessionService.GetSession(SessionId);
+    }
+
+    private void HandleValidSubmit()
+    {
+        Console.WriteLine("OnValidSubmit");
+        // route back to sessions.
+    }
+}
