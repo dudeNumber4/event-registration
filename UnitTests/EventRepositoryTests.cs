@@ -17,6 +17,7 @@ namespace UnitTests
     public class EventRepositoryTests
     {
 
+        // Last time I checked, MSTest doesn't have a very good story for async tests.
         private static object _lock = new object();
         internal const string FIRST_RECORD_ID = "1";
         private static EventRepo _eventRepository;
@@ -34,10 +35,10 @@ namespace UnitTests
         [ClassCleanup]
         public static void ClassCleanup()
         {
-            _eventRepository.DeleteFile(RecordTypes.Itinerary);
-            _eventRepository.DeleteFile(RecordTypes.Registrant);
-            _eventRepository.DeleteFile(RecordTypes.Registration);
-            _eventRepository.DeleteFile(RecordTypes.Session);
+            _eventRepository.DeleteFile(RecordTypes.Itinerary).Wait();
+            _eventRepository.DeleteFile(RecordTypes.Registrant).Wait();
+            _eventRepository.DeleteFile(RecordTypes.Registration).Wait();
+            _eventRepository.DeleteFile(RecordTypes.Session).Wait();
         }
 
         [TestMethod]
@@ -154,7 +155,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void DeleteRecord()
+        public void DeleteSession()
         {
             lock (_lock)
             {
@@ -167,6 +168,37 @@ namespace UnitTests
                 _eventRepository.DeleteRecord(result[0].Id.ToString(), RecordTypes.Session).Wait();
                 result = _eventRepository.GetAllSessions().Result;
                 Assert.AreEqual(1, result.Count);
+            }
+        }
+
+        [TestMethod]
+        public void UpdateSession()
+        {
+            const DayOfWeek testDay = DayOfWeek.Monday;
+            const string testTitle = "titl";
+            const string testDesc = "descr";
+            lock (_lock)
+            {
+                _eventRepository.DeleteFile(RecordTypes.Session).Wait();
+                // Add 2 sessions
+                Task.WaitAll(new Task[] { _eventRepository.AddRecord(RecordTypes.Session, GetEnumerableDataFor(RecordTypes.Session)) });
+                Task.WaitAll(new Task[] { _eventRepository.AddRecord(RecordTypes.Session, GetEnumerableDataFor(RecordTypes.Session)) });
+                List<Session> result = _eventRepository.GetAllSessions().Result;
+                Assert.AreEqual(2, result.Count);
+                // edit; refresh.
+                Session session = result[0];
+                int initialSessionId = session.Id;
+                session.Day = testDay;
+                session.Description = testDesc;
+                session.Title = testTitle;
+                _eventRepository.UpdateRecord(result[0], RecordTypes.Session).Wait();
+                result = _eventRepository.GetAllSessions().Result;
+                Assert.AreEqual(2, result.Count);
+                session = result.FirstOrDefault(s => s.Title == testTitle);
+                Assert.IsNotNull(session);
+                Assert.AreEqual(initialSessionId, session.Id);
+                Assert.AreEqual(testDay, session.Day);
+                Assert.AreEqual(testDesc, session.Description);
             }
         }
 
@@ -193,7 +225,7 @@ namespace UnitTests
         //    }
         //}
 
-        void ValidateEventRecord(IEventRecord eventRecord, RecordTypes rt)
+        private void ValidateEventRecord(IEventRecord eventRecord, RecordTypes rt)
         {
             switch (rt)
             {

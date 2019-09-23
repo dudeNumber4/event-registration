@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using EventRepository;
 using EventRepo = EventRepository.EventRepository;
 
-namespace EventRegistration.Data
+namespace EventRegistration.Services
 {
 
     public abstract class ServiceBase

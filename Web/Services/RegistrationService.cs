@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using EventModels;
 using EventRepository;
 
-namespace EventRegistration.Data
+namespace EventRegistration.Services
 {
 
     public class RegistrationService : ServiceBase

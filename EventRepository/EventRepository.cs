@@ -31,23 +31,23 @@ namespace EventRepository
                 var existing = await GetRecord(eventRecord.Id.ToString(), rt);
                 if (existing.Any())
                 {
-                    await DeleteRecord(eventRecord.Id.ToString(), rt);
+                    await DeleteRecord(eventRecord.Id.ToString(), rt).ConfigureAwait(false);
                 }
 
                 // You'd think you could use switch expressions, but not when calling a method.
                 switch (rt)
                 {
                     case RecordTypes.Itinerary:
-                        await AddRecord(RecordTypes.Itinerary, ItineraryContents(eventRecord as Itinerary));
+                        await AddRecord(RecordTypes.Itinerary, ItineraryContents(eventRecord as Itinerary)).ConfigureAwait(false);
                         break;
                     case RecordTypes.Registrant:
-                        await AddRecord(RecordTypes.Session, SessionContents(eventRecord as Session));
+                        await AddRecord(RecordTypes.Registrant, RegistrantContents(eventRecord as Registrant)).ConfigureAwait(false);
                         break;
                     case RecordTypes.Registration:
-                        await AddRecord(RecordTypes.Registration, RegistrationContents(eventRecord as Registration));
+                        await AddRecord(RecordTypes.Registration, RegistrationContents(eventRecord as Registration)).ConfigureAwait(false);
                         break;
                     case RecordTypes.Session:
-                        await AddRecord(RecordTypes.Registrant, RegistrantContents(eventRecord as Registrant));
+                        await AddRecord(RecordTypes.Session, SessionContents(eventRecord as Session)).ConfigureAwait(false);
                         break;
                     default:
                         break;
@@ -62,7 +62,7 @@ namespace EventRepository
         /// <param name="fileContents">Fields for the record.</param>
         public async Task AddRecord(RecordTypes rt, IEnumerable<string> fileContents)
         {
-            await Task.Run(() => DataUtils.AddRecord(RecordTypeConverter.GetFileName(rt), ListModule.OfSeq(fileContents)));
+            await Task.Run(() => DataUtils.AddRecord(RecordTypeConverter.GetFileName(rt), ListModule.OfSeq(fileContents))).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -77,28 +77,28 @@ namespace EventRepository
             var registration = await GetRecord(i.RegistrationId.ToString(), RecordTypes.Registration);
             if (!registration.Any())
             {
-                return await Task.FromResult(false);
+                return await Task.FromResult(false).ConfigureAwait(false);
             }
             else
             {
-                await AddRecord(RecordTypes.Itinerary, ItineraryContents(i));
-                return await Task.FromResult(true);
+                await AddRecord(RecordTypes.Itinerary, ItineraryContents(i)).ConfigureAwait(false);
+                return await Task.FromResult(true).ConfigureAwait(false);
             }
         }
 
         public async Task AddRegistration(Registration r)
         {
-            await AddRecord(RecordTypes.Registration, RegistrationContents(r));
+            await AddRecord(RecordTypes.Registration, RegistrationContents(r)).ConfigureAwait(false);
         }
 
         public async Task AddRegistrant(Registrant r)
         {
-            await AddRecord(RecordTypes.Registrant, RegistrantContents(r));
+            await AddRecord(RecordTypes.Registrant, RegistrantContents(r)).ConfigureAwait(false);
         }
 
         public async Task AddSession(Session s)
         {
-            await AddRecord(RecordTypes.Session, SessionContents(s));
+            await AddRecord(RecordTypes.Session, SessionContents(s)).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -107,7 +107,7 @@ namespace EventRepository
         /// <param name="rt"></param>
         public async Task DeleteFile(RecordTypes rt)
         {
-            await Task.Run(() => DataUtils.DeleteFile(RecordTypeConverter.GetFileName(rt)));
+            await Task.Run(() => DataUtils.DeleteFile(RecordTypeConverter.GetFileName(rt))).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -117,7 +117,7 @@ namespace EventRepository
         /// <param name="rt"></param>
         public async Task DeleteRecord(string id, RecordTypes rt)
         {
-            await Task.Run(() => DataUtils.DeleteRecord(id, RecordTypeConverter.GetFileName(rt)));
+            await Task.Run(() => DataUtils.DeleteRecord(id, RecordTypeConverter.GetFileName(rt))).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -127,7 +127,7 @@ namespace EventRepository
         /// <param name="rt"></param>
         public async Task<List<string>> GetRecord(string id, RecordTypes rt)
         {
-            var result = await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id, RecordTypeConverter.GetFileName(rt))));
+            var result = await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id, RecordTypeConverter.GetFileName(rt)))).ConfigureAwait(false);
             return result;
         }
 
@@ -137,31 +137,31 @@ namespace EventRepository
         /// <param name="id"></param>
         public async Task<Itinerary> GetItinerary(string id)
         {
-            var record = await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id, RecordTypeConverter.GetFileName(RecordTypes.Itinerary))));
+            var record = await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id, RecordTypeConverter.GetFileName(RecordTypes.Itinerary)))).ConfigureAwait(false);
             return new Itinerary().FromBasicRecord(record) as Itinerary;
         }
 
         public async Task<Registration> GetRegistration(string id)
         {
-            var record = await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id, RecordTypeConverter.GetFileName(RecordTypes.Registration))));
+            var record = await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id, RecordTypeConverter.GetFileName(RecordTypes.Registration)))).ConfigureAwait(false);
             return new Registration().FromBasicRecord(record) as Registration;
         }
 
         public async Task<Registrant> GetRegistrant(string id)
         {
-            var record = await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id, RecordTypeConverter.GetFileName(RecordTypes.Registrant))));
+            var record = await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id, RecordTypeConverter.GetFileName(RecordTypes.Registrant)))).ConfigureAwait(false);
             return new Registrant().FromBasicRecord(record) as Registrant;
         }
 
         public async Task<Session> GetSession(string id)
         {
-            var record = await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id, RecordTypeConverter.GetFileName(RecordTypes.Session))));
+            var record = await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id, RecordTypeConverter.GetFileName(RecordTypes.Session)))).ConfigureAwait(false);
             return new Session().FromBasicRecord(record) as Session;
         }
 
         public async Task<List<Session>> GetAllSessions()
         {
-            FSharpList<FSharpList<string>> dataSessions = await Task.FromResult(DataUtils.GetAllSessions());
+            FSharpList<FSharpList<string>> dataSessions = await Task.FromResult(DataUtils.GetAllSessions()).ConfigureAwait(false);
             return GetCSharpList(dataSessions).Select(s => new Session().FromBasicRecord(s) as Session).ToList();
         }
 

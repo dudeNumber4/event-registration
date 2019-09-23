@@ -5,24 +5,30 @@ using System.Threading.Tasks;
 using EventModels;
 using EventRepository;
 
-namespace EventRegistration.Data
+namespace EventRegistration.Services
 {
 
     /// <summary>
     /// This "service" is really in place of some API in some very complex separate project/solution
+    /// It's only state is the repository in the base class.
     /// </summary>
     public class SessionService: ServiceBase
     {
 
         public async Task<List<Session>> GetAllSessions(bool createNew = true)
         {
-            var sessions = await _eventRepository.GetAllSessions();
+            var sessions = await _eventRepository.GetAllSessions().ConfigureAwait(false);
             if ((sessions.Count == 0) && createNew)
             {
                 await LoadSampleSessions();
-                sessions = await _eventRepository.GetAllSessions();
+                sessions = await _eventRepository.GetAllSessions().ConfigureAwait(false);
             }
             return sessions;
+        }
+
+        public async Task EditSession(Session s)
+        {
+            await _eventRepository.UpdateRecord(s, RecordTypes.Session).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -32,7 +38,7 @@ namespace EventRegistration.Data
         /// <returns></returns>
         public async Task<Session> GetSession(string id)
         {
-            var session = await _eventRepository.GetSession(id);
+            var session = await _eventRepository.GetSession(id).ConfigureAwait(false);
             return session;
         }
 
@@ -42,18 +48,18 @@ namespace EventRegistration.Data
         /// <returns></returns>
         public async Task DeleteAllSessions()
         {
-            await _eventRepository.DeleteFile(RecordTypes.Session);
+            await _eventRepository.DeleteFile(RecordTypes.Session).ConfigureAwait(false);
         }
 
         public async Task DeleteSession(int id)
         {
-            await _eventRepository.DeleteRecord(id.ToString(), RecordTypes.Session);
+            await _eventRepository.DeleteRecord(id.ToString(), RecordTypes.Session).ConfigureAwait(false);
         }
 
         private async Task LoadSampleSessions()
         {
-            await _eventRepository.AddRecord(RecordTypes.Session, GetSampleSessionEnumerable(2));
-            await _eventRepository.AddRecord(RecordTypes.Session, GetSampleSessionEnumerable(1));
+            await _eventRepository.AddRecord(RecordTypes.Session, GetSampleSessionEnumerable(2)).ConfigureAwait(false);
+            await _eventRepository.AddRecord(RecordTypes.Session, GetSampleSessionEnumerable(1)).ConfigureAwait(false);
         }
 
         // temp

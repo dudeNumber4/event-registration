@@ -1,0 +1,72 @@
+﻿@page "/sessions/{SessionId}"
+@using System.Diagnostics
+@using EventRegistration.Services
+@using EventModels
+@inject SessionService SessionService
+@inject NavigationManager NavigationManager
+
+@if (session == null)
+{
+  <p><em>Roading...</em></p>
+}
+else
+{
+    <EditForm Model="@session" OnValidSubmit="@HandleValidSubmit">
+      @*Validation for built-in edit form is via annotations*@
+      <DataAnnotationsValidator />
+      <ValidationSummary />
+      <div class="container">
+        <div class="row">
+          <h3 class="col-sm-10">Behold: the session edit component.</h3>
+        </div>
+        <div class="row">
+          <label for="title" class="col-sm-4">Title</label>
+          <InputText id="title" @bind-Value="@session.Title" class="col-sm-4" />
+        </div>
+        <div class="row">
+          <label for="description" class="col-sm-4">Description</label>
+          <InputText id="description" @bind-Value="@session.Description" class="col-sm-4" />
+        </div>
+        <div class="row">
+          <label for="day" class="col-sm-4">Day</label>
+          <span id="day" class="col-sm-4">@session.TempDay</span>
+        </div>
+        <div class="row">
+          <label for="dayselect" class="col-sm-4">Day2</label>
+          @*<DaySelect Session="session" OnSelected="DayChangedHandler" />*@ @*no worky*@
+          <DaySelect Session="session" />
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-2">&nbsp;</div> @*<-- Because I can't figure bootstrap grid system out*@
+        <button type="submit" class="col-sm-1">Submit</button>
+      </div>
+    </EditForm>
+}
+
+@code {
+    private Session session = null; // must get from service
+
+    [Parameter] // means it's passed on URL.
+    public string SessionId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+      Debug.Print(nameof(OnInitializedAsync));
+      session = await SessionService.GetSession(SessionId) ?? new Session { Title = "Can't retrieve selected session!" };
+    }
+
+    private async Task HandleValidSubmit()
+    {
+      Debug.Print($"{nameof(NonModalSessionEdit)}.{nameof(HandleValidSubmit)}");
+      await SessionService.EditSession(session);
+      NavigationManager.NavigateTo("sessions", true); // true: force refresh
+    }
+
+    // doesn't work (would need this to update the separate day display herein with the selected value of DaySelect).
+    //private void DayChangedHandler(string s)
+    //{
+    //    Debug.Print(s);
+    //    //session.Day = s.Day;
+    //}
+}

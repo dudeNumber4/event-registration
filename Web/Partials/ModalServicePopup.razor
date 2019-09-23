@@ -1,0 +1,65 @@
+﻿@*Note that this nuget requires a component back in MainLayout*@
+@using EventRegistration.Services
+@using EventModels
+@inject SessionService SessionService
+@inject IModalService Modal
+
+  <div class="container">
+    <div class="row">
+      <label for="sessionid" class="col">Id</label>
+      <span id="sessionid" class="col">@SessionId</span>
+    </div>
+    <div class="row">
+      <label for="title" class="col">Title</label>
+      <input id="title" @bind="@session.Title" class="col" />
+    </div>
+    <div class="row">
+      <label for="description" class="col">Description</label>
+      <input id="description" @bind="@session.Description" class="col" />
+    </div>
+    <div class="row">
+      <label for="day" class="col">Day</label>
+      @*DaySelect's InputSelect must be child of edit form*@
+      <span id="day" class="col">@session.TempDay</span>
+    </div>
+
+    <button @onclick="e => Save(e)" class="btn btn-primary">Submit</button>
+    <button @onclick="e => Cancel(e)" class="btn btn-secondary">Cancel</button>
+  </div>
+
+@code {
+    [CascadingParameter]
+    ModalParameters Parameters { get; set; } // for the modal nuget
+
+    private Session session = new Session(); // must get from service
+
+    public string SessionId { get; set; }
+
+    protected override void OnInitialized()
+    {
+      SessionId = Parameters.Get<int>(nameof(SessionId)).ToString();
+      session = SessionService.GetSession(SessionId).Result ?? new Session { Title = "Can't retrieve selected session!" };
+    }
+
+    void Save(MouseEventArgs e)
+    {
+      if (session != null)
+      {
+        Task.Run(() => SessionService.EditSession(session));
+      }
+      Modal.Close(ModalResult.Ok<Session>(session));
+    }
+
+    void Cancel(MouseEventArgs e)
+    {
+      Modal.Cancel();
+    }
+
+    // async no worky here.
+    //protected override async Task OnInitializedAsync()
+    //{
+    //  await Task.Run(() => SessionId = Parameters.Get<string>(nameof(SessionId)));
+    //  //session = await SessionService.GetSession(SessionId);
+    //}
+
+}

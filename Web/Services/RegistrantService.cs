@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace EventRegistration.Data
+namespace EventRegistration.Services
 {
 
     public class RegistrantService : ServiceBase

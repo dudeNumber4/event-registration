@@ -11,11 +11,28 @@ namespace EventModels
 
         public int Id { get; set; }
         public DayOfWeek Day { get; set; }
-        [Required]
+        [Required(ErrorMessage = "A sesssion needs a title.")]
         [StringLength(50, ErrorMessage = "Title is too long.")]
         public string Title { get; set; }
         [StringLength(1024, ErrorMessage = "Description is too long.")]
         public string Description { get; set; }
+
+        /// <summary>
+        /// Just here temporarily to demonstrate client state.
+        /// </summary>
+        public string TempDay { get { return Enum.GetName(typeof(DayOfWeek), Day); } }
+
+        /// <summary>
+        /// ToDo: auto-mapper?
+        /// </summary>
+        /// <param name="other"></param>
+        public void AutoMap(Session other)
+        {
+            Id = other.Id;
+            Day = other.Day;
+            Title = other.Title;
+            Description = other.Description;
+        }
 
         public IEventRecord FromBasicRecord(List<string> record)
         {

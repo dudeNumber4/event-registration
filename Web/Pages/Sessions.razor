@@ -1,80 +1,139 @@
 ﻿@page "/sessions"
-@using EventRegistration.Data
+@using EventRegistration.Services
 @using EventModels
 @using System.Diagnostics
+@using EventRegistration.Shared
 @inject SessionService SessionService
+@inject IJSRuntime JSRuntime
+@inject IModalService Modal // https://github.com/Blazored/Modal
+@inject NavigationManager NavigationManager
 
 @if (sessions == null)
 {
-    <p><em>Roading...</em></p>
+  <p><em>Roading...</em></p>
 }
 else
 {
-    <h3>Sessions</h3>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Day</th>
-                <th>Title</th>
-                <th>Description</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var session in sessions)
-            {
-            <tr>
-                <td><button class="btn btn-primary" @onclick="e => DeleteSession(e, session.Id)">Delete Session</button></td>
-                <td>@session.Day</td>
-                <td>@session.Title</td>
-                <td>@session.Description</td>
-                @*You caint use the plain attribute data-toggle way*@
-                @* HtmlHelper.InvokeComponent or something like that *@
-                @*(await Html.RenderComponentAsync()) href="/SimpleSessionForm/@session.Id.ToString()"*@
-                @*<td><button class="btn btn-primary btn-sm" @onclick="e => await Html.RenderComponentAsync<SimpleSessionForm>(session.Id)">Edit</button></td>*@
-                @*<td><button class="btn btn-primary btn-sm" @onclick="e => EditSession(e, session.Id)">Edit</button></td>*@
-            </tr>
-            }
-        </tbody>
-    </table>
-    <div>
-        <button class="btn btn-primary" @onclick="DeleteAll">Delete all Sessions</button>
+  <h3>Sessions</h3>
+  <table class="table">
+    <thead>
+      <tr>
+        <th></th>
+        <th>Day</th>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Edit Method 1</th>
+        <th>Edit Method 2</th>
+        <th>Edit Method 3</th>
+      </tr>
+    </thead>
+    <tbody>
+      @foreach (var session in sessions)
+      {
+        <tr>
+          <td><button class="btn btn-primary" @onclick="e => DeleteSession(e, session.Id)">Delete Session</button></td>
+          <td>@session.Day</td>
+          <td>@session.Title</td>
+          <td>@session.Description</td>
+          @*fails:*@
+          @*(await Html.RenderComponentAsync()) href="/SimpleSessionForm/@session.Id.ToString()"*@
+          @*<td><button class="btn btn-primary btn-sm" @onclick="e => await Html.RenderComponentAsync<SimpleSessionForm>(session.Id)">Edit</button></td>*@
+
+          <td><button class="btn btn-primary" @onclick="e => EditSessionOldeSchool(e, session.Id)">Ye Olde Modal</button></td>
+          <td><button @onclick="@(() => EditSessionModalService(session.Id))" class="btn btn-primary">Modal Service</button></td>
+          <td><button @onclick="@(() => EditSessionNonModal(session.Id))" class="btn btn-primary">Non Modal</button></td>
+        </tr>
+      }
+    </tbody>
+  </table>
+  <div>
+
+    <button class="btn btn-primary" @onclick="DeleteAll">Delete all Sessions</button>
+
+    @* https://getbootstrap.com/docs/4.3/components/modal/ *@
+    @*You caint use the plain attribute data-toggle way*@
+    <div class="modal" id="editSession" role="dialog" aria-labelledby="edit session" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Edit Session</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <OldeSchoolPopup />
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 }
 
 @code {
-    List<Session> sessions;
-    int editSessionId = 0;
+  List<Session> sessions;
+  int editSessionId = 0;
 
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadSessions(true);
-    }
+  protected override async Task OnInitializedAsync()
+  {
+    await LoadSessions(true).ConfigureAwait(false);
+  }
 
-    async Task DeleteAll(MouseEventArgs e)
-    {
-        await SessionService.DeleteAllSessions();
-        await LoadSessions(false);
-    }
+  async Task DeleteAll(MouseEventArgs e)
+  {
+    await SessionService.DeleteAllSessions().ConfigureAwait(false);
+    await LoadSessions(false).ConfigureAwait(false);
+  }
 
-    void EditSession(MouseEventArgs e, int id)
-    {
-        // RESUME: https://stackoverflow.com/questions/57733416/cant-render-blazor-component
-        // resume in sample project
-        // Back in other sample project; this is very hard.
-        //Microsoft.AspNetCore.Html.
-        //HtmlRenderer.r
-        //await Html.RenderComponentAsync<SimpleSessionForm>(id.ToString());
-    }
+  void EditSessionNonModal(int sessionId)
+  {
+    NavigationManager.NavigateTo($"sessions/{sessionId}");
+  }
 
-    async Task DeleteSession(MouseEventArgs e, int id)
-    {
-        await SessionService.DeleteSession(id);
-        // Note that each time I call this, something is watching it (not sure how that mechanism works), and the UI is updated
-        await LoadSessions(false);
-    }
+  void EditSessionModalService(int sessionId)
+  {
+    var parameters = new ModalParameters();
+    parameters.Add(nameof(ModalServicePopup.SessionId), sessionId);
+    Modal.OnClose += OnModalClose;
+    Modal.Show("Edit Session", typeof(ModalServicePopup), parameters);
+  }
 
-    async Task LoadSessions(bool createNew = true)
+  async Task EditSessionOldeSchool(MouseEventArgs e, int id)
+  {
+    // https://docs.microsoft.com/en-us/aspnet/core/blazor/javascript-interop?view=aspnetcore-3.0
+    Debug.Print("poppit");
+    await JSRuntime.InvokeVoidAsync("JSInterop.popEditSession", true).ConfigureAwait(false);
+  }
+
+  async Task DeleteSession(MouseEventArgs e, int id)
+  {
+    await SessionService.DeleteSession(id).ConfigureAwait(false);
+    // Each time I call this, the UI updates diff (implicit binding without declaring anything).
+    // This happens for free with data held in DI services.
+    await LoadSessions(false).ConfigureAwait(false);
+  }
+
+  async Task LoadSessions(bool createNew = true)
+  {
+    sessions = await SessionService.GetAllSessions(createNew).ConfigureAwait(false);
+  }
+
+  private void OnModalClose(ModalResult mr)
+  {
+    //StateHasChanged();  // the circuit has nothing within it changed.
+    if (!mr.Cancelled)
     {
-        sessions = await SessionService.GetAllSessions(createNew);
+      var eventSession = (Session)mr.Data;
+      if (eventSession != null)
+      {
+        var editedSession = sessions.FirstOrDefault(s => s.Id == eventSession.Id);
+        if (editedSession != null)
+        {
+          editedSession.AutoMap(eventSession);
+          StateHasChanged();
+        }
+      }
     }
+    Modal.OnClose -= OnModalClose;
+  }
 }

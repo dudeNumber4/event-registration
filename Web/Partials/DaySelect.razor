@@ -1,0 +1,21 @@
+﻿@using EventModels
+
+@*<InputSelect @bind-Value="@Session.Day" @onchange="@(() => OnSelected.InvokeAsync("hello from child"))">*@
+<InputSelect @bind-Value="@Session.Day">
+  <option value="@DayOfWeek.Sunday">@nameof(DayOfWeek.Sunday)</option>
+  <option value="@DayOfWeek.Monday">@nameof(DayOfWeek.Monday)</option>
+  <option value="@DayOfWeek.Tuesday">@nameof(DayOfWeek.Tuesday)</option>
+  <option value="@DayOfWeek.Wednesday">@nameof(DayOfWeek.Wednesday)</option>
+  <option value="@DayOfWeek.Thursday">@nameof(DayOfWeek.Thursday)</option>
+  <option value="@DayOfWeek.Friday">@nameof(DayOfWeek.Friday)</option>
+  <option value="@DayOfWeek.Saturday">@nameof(DayOfWeek.Saturday)</option>
+</InputSelect>
+
+@code {
+    [Parameter]
+    public Session Session { get; set; }
+
+    // doesn't work
+    //[Parameter]
+    //public EventCallback<string> OnSelected { get; set; }
+}
