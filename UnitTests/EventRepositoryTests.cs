@@ -213,18 +213,6 @@ namespace UnitTests
             }
         }
 
-        //[TestMethod]
-        //public void GetNextId()
-        //{
-        //    lock (_lock)
-        //    {
-        //        Task.WaitAll(new Task[] { _eventRepository.AddRecord(RecordTypes.Session, GetEnumerableDataFor(RecordTypes.Session)) });
-        //        List<Session> result = _eventRepository.GetAllSessions().Result;
-        //        var nextId = _eventRepository.NextId(RecordTypes.Session);
-        //        Assert.IsTrue(nextId == result.Count() + 1);
-        //    }
-        //}
-
         private void ValidateEventRecord(IEventRecord eventRecord, RecordTypes rt)
         {
             switch (rt)

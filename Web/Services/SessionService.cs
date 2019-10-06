@@ -20,7 +20,6 @@ namespace EventRegistration.Services
             var sessions = await _eventRepository.GetAllSessions().ConfigureAwait(false);
             if ((sessions.Count == 0) && createNew)
             {
-                await LoadSampleSessions();
                 sessions = await _eventRepository.GetAllSessions().ConfigureAwait(false);
             }
             return sessions;
@@ -56,19 +55,6 @@ namespace EventRegistration.Services
             await _eventRepository.DeleteRecord(id.ToString(), RecordTypes.Session).ConfigureAwait(false);
         }
 
-        private async Task LoadSampleSessions()
-        {
-            await _eventRepository.AddRecord(RecordTypes.Session, GetSampleSessionEnumerable(2)).ConfigureAwait(false);
-            await _eventRepository.AddRecord(RecordTypes.Session, GetSampleSessionEnumerable(1)).ConfigureAwait(false);
-        }
-
-        // temp
-        private static IEnumerable<string> GetSampleSessionEnumerable(int i)
-        {
-            yield return ((int)((DayOfWeek)i)).ToString();
-            yield return $"Some Title {i}";
-            yield return $"Some Description {i}";
-        }
-
     }
+
 }

@@ -11,27 +11,11 @@
     <base href="~/" />
     <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
     <link href="css/site.css" rel="stylesheet" />
-    @*Ye olde fashioned jQuery.  I'm only using it so I can pop a modal.*@
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    @* ♪♫ Ya can't have one without the... other ♪♫ *@
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-    <link href="_content/Blazored.Modal/blazored-modal.css" rel="stylesheet" />
 </head>
 <body>
     <app>
         @(await Html.RenderComponentAsync<App>(RenderMode.ServerPrerendered))
     </app>
     <script src="_framework/blazor.server.js"></script>
-
-    <script>
-        // Pop modal olde school.
-      window.JSInterop = {
-        popEditSession: function(show) {
-          console.log('poppit');
-          //throw 'RUN FOR YOUR LIVES!';
-          $('#editSession').modal(show ? 'show' : 'hide');
-        }
-      };
-    </script>
 </body>
 </html>

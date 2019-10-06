@@ -17,23 +17,6 @@ namespace EventModels
         [StringLength(1024, ErrorMessage = "Description is too long.")]
         public string Description { get; set; }
 
-        /// <summary>
-        /// Just here temporarily to demonstrate client state.
-        /// </summary>
-        public string TempDay { get { return Enum.GetName(typeof(DayOfWeek), Day); } }
-
-        /// <summary>
-        /// ToDo: auto-mapper?
-        /// </summary>
-        /// <param name="other"></param>
-        public void AutoMap(Session other)
-        {
-            Id = other.Id;
-            Day = other.Day;
-            Title = other.Title;
-            Description = other.Description;
-        }
-
         public IEventRecord FromBasicRecord(List<string> record)
         {
             if ((record?.Count == 4) && int.TryParse(record[0], out var id) && int.TryParse(record[1], out var dayOfWeek))
