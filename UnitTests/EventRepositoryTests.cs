@@ -44,9 +44,9 @@ namespace UnitTests
         [TestMethod]
         public void GetAllSessions()
         {
-            // RESUME: this test is flaky.
             lock (_lock)
             {
+                _eventRepository.DeleteFile(RecordTypes.Session).Wait();
                 Task.WaitAll(new Task[] { _eventRepository.AddRecord(RecordTypes.Session, GetNew(RecordTypes.Session)) });
                 Task.WaitAll(new Task[] { _eventRepository.AddRecord(RecordTypes.Session, GetNew(RecordTypes.Session)) });
                 List<Session> result = _eventRepository.GetAllSessions().Result;
