@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace EventModels
@@ -13,9 +14,10 @@ namespace EventModels
         public int Id { get; set; }
         public int RegistrantId { get; set; }
 
-        public IEventRecord FromBasicRecord(List<string> record)
+        public IEventRecord FromBasicRecord(IEnumerable<string> record)
         {
-            if ((record?.Count == 2) && int.TryParse(record[0], out var id) && int.TryParse(record[1], out var registrantId))
+            var recordList = record.ToList();
+            if ((recordList?.Count == 2) && int.TryParse(recordList[0], out var id) && int.TryParse(recordList[1], out var registrantId))
             {
                 var result = new Registration
                 {
@@ -28,6 +30,11 @@ namespace EventModels
             {
                 return null;
             }
+        }
+
+        public IEnumerable<string> ToBasicRecord()
+        {
+            yield return RegistrantId.ToString();
         }
 
         public Itinerary GetItinerary(SessionList sessionList)

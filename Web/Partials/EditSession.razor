@@ -48,7 +48,7 @@ else
   protected override async Task OnInitializedAsync()
   {
     Debug.Print(nameof(OnInitializedAsync));
-    session = await SessionService.GetSession(SessionId) ?? new Session { Title = "Can't retrieve selected session!" };
+    session = await SessionService.GetSession(SessionId) ?? new Session { Title = "New Session" };
   }
 
   private async Task HandleValidSubmit()

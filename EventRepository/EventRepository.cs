@@ -34,24 +34,7 @@ namespace EventRepository
                     await DeleteRecord(eventRecord.Id.ToString(), rt).ConfigureAwait(false);
                 }
 
-                // You'd think you could use switch expressions, but not when calling a method.
-                switch (rt)
-                {
-                    case RecordTypes.Itinerary:
-                        await AddRecord(RecordTypes.Itinerary, ItineraryContents(eventRecord as Itinerary)).ConfigureAwait(false);
-                        break;
-                    case RecordTypes.Registrant:
-                        await AddRecord(RecordTypes.Registrant, RegistrantContents(eventRecord as Registrant)).ConfigureAwait(false);
-                        break;
-                    case RecordTypes.Registration:
-                        await AddRecord(RecordTypes.Registration, RegistrationContents(eventRecord as Registration)).ConfigureAwait(false);
-                        break;
-                    case RecordTypes.Session:
-                        await AddRecord(RecordTypes.Session, SessionContents(eventRecord as Session)).ConfigureAwait(false);
-                        break;
-                    default:
-                        break;
-                }
+                await AddRecord(rt, eventRecord).ConfigureAwait(false);
             }
         }
         
@@ -59,46 +42,15 @@ namespace EventRepository
         /// 
         /// </summary>
         /// <param name="rt"></param>
-        /// <param name="fileContents">Fields for the record.</param>
-        public async Task AddRecord(RecordTypes rt, IEnumerable<string> fileContents)
+        /// <param name="recordContents">Fields for the record.</param>
+        public async Task<int> AddRecord(RecordTypes rt, IEventRecord record)
         {
-            await Task.Run(() => DataUtils.AddRecord(RecordTypeConverter.GetFileName(rt), ListModule.OfSeq(fileContents))).ConfigureAwait(false);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="i"></param>
-        /// <returns></returns>
-        public async Task<bool> AddItinerary(Itinerary i)
-        {
-            Debug.Assert(i != null);
-            Debug.Assert(i.RegistrationId > 0);
-            var registration = await GetRecord(i.RegistrationId.ToString(), RecordTypes.Registration);
-            if (!registration.Any())
+            return await Task.Run(() =>
             {
-                return await Task.FromResult(false).ConfigureAwait(false);
-            }
-            else
-            {
-                await AddRecord(RecordTypes.Itinerary, ItineraryContents(i)).ConfigureAwait(false);
-                return await Task.FromResult(true).ConfigureAwait(false);
-            }
-        }
-
-        public async Task AddRegistration(Registration r)
-        {
-            await AddRecord(RecordTypes.Registration, RegistrationContents(r)).ConfigureAwait(false);
-        }
-
-        public async Task AddRegistrant(Registrant r)
-        {
-            await AddRecord(RecordTypes.Registrant, RegistrantContents(r)).ConfigureAwait(false);
-        }
-
-        public async Task AddSession(Session s)
-        {
-            await AddRecord(RecordTypes.Session, SessionContents(s)).ConfigureAwait(false);
+                FSharpList<string> recordValues = ListModule.OfSeq(record.ToBasicRecord());
+                string newId = DataUtils.AddRecord(RecordTypeConverter.GetFileName(rt), recordValues);
+                return Convert.ToInt32(newId);
+            }).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -135,27 +87,27 @@ namespace EventRepository
         /// 
         /// </summary>
         /// <param name="id"></param>
-        public async Task<Itinerary> GetItinerary(string id)
+        public async Task<Itinerary> GetItinerary(int id)
         {
-            var record = await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id, RecordTypeConverter.GetFileName(RecordTypes.Itinerary)))).ConfigureAwait(false);
+            var record = await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id.ToString(), RecordTypeConverter.GetFileName(RecordTypes.Itinerary)))).ConfigureAwait(false);
             return new Itinerary().FromBasicRecord(record) as Itinerary;
         }
 
-        public async Task<Registration> GetRegistration(string id)
+        public async Task<Registration> GetRegistration(int id)
         {
-            var record = await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id, RecordTypeConverter.GetFileName(RecordTypes.Registration)))).ConfigureAwait(false);
+            var record = await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id.ToString(), RecordTypeConverter.GetFileName(RecordTypes.Registration)))).ConfigureAwait(false);
             return new Registration().FromBasicRecord(record) as Registration;
         }
 
-        public async Task<Registrant> GetRegistrant(string id)
+        public async Task<Registrant> GetRegistrant(int id)
         {
-            var record = await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id, RecordTypeConverter.GetFileName(RecordTypes.Registrant)))).ConfigureAwait(false);
+            var record = await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id.ToString(), RecordTypeConverter.GetFileName(RecordTypes.Registrant)))).ConfigureAwait(false);
             return new Registrant().FromBasicRecord(record) as Registrant;
         }
 
-        public async Task<Session> GetSession(string id)
+        public async Task<Session> GetSession(int id)
         {
-            var record = await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id, RecordTypeConverter.GetFileName(RecordTypes.Session)))).ConfigureAwait(false);
+            var record = await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id.ToString(), RecordTypeConverter.GetFileName(RecordTypes.Session)))).ConfigureAwait(false);
             return new Session().FromBasicRecord(record) as Session;
         }
 
@@ -190,39 +142,6 @@ namespace EventRepository
         {
             IEnumerable<string> enumerable = SeqModule.OfList(list);
             return new List<string>(enumerable);
-        }
-
-        private IEnumerable<string> ItineraryContents(Itinerary i)
-        {
-            //yield return i.Id.ToString(); database generates this
-            yield return i.RegistrationId.ToString();
-            foreach (var session in i.SessionList)
-            {
-                yield return session.Id.ToString();
-            }
-        }
-
-        private IEnumerable<string> RegistrationContents(Registration r)
-        {
-            //yield return r.Id.ToString(); database generates this
-            yield return r.RegistrantId.ToString();
-        }
-
-        private IEnumerable<string> RegistrantContents(Registrant r)
-        {
-            //yield return r.Id.ToString(); database generates this
-            yield return r.PersonalInfo?.FirstName;
-            yield return r.PersonalInfo?.LastName;
-            yield return r.PersonalInfo?.Email;
-            yield return r.EmploymentInfo?.OrgName;
-            yield return r.EmploymentInfo?.Industry;
-        }
-
-        private IEnumerable<string> SessionContents(Session s)
-        {
-            yield return ((int)s.Day).ToString();
-            yield return s.Title;
-            yield return s.Description;
         }
 
     }

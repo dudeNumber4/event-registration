@@ -37,7 +37,7 @@ namespace EventRegistration.Services
         /// <returns></returns>
         public async Task<Session> GetSession(string id)
         {
-            var session = await _eventRepository.GetSession(id).ConfigureAwait(false);
+            var session = await _eventRepository.GetSession(int.Parse(id)).ConfigureAwait(false);
             return session;
         }
 

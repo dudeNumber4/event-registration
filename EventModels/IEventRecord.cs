@@ -13,6 +13,12 @@ namespace EventModels
         /// </summary>
         /// <param name="record">Data returned from EventRepository for a given file type</param>
         /// <returns></returns>
-        IEventRecord FromBasicRecord(List<string> record);
+        IEventRecord FromBasicRecord(IEnumerable<string> record);
+
+        /// <summary>
+        /// Note that this enumeration of strings doesn't include any id.  It's assumed this is a newly instantiated object that hasn't been assigned one yet.
+        /// </summary>
+        /// <returns>The goods to pass to the storage layer.</returns>
+        IEnumerable<string> ToBasicRecord();
     }
 }

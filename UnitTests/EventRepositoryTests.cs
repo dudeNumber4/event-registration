@@ -19,7 +19,7 @@ namespace UnitTests
 
         // Last time I checked, MSTest doesn't have a very good story for async tests.
         private static object _lock = new object();
-        internal const string FIRST_RECORD_ID = "1";
+        internal const int FIRST_RECORD_ID = 1;
         private static EventRepo _eventRepository;
 
         [ClassInitialize]
@@ -44,10 +44,11 @@ namespace UnitTests
         [TestMethod]
         public void GetAllSessions()
         {
+            // RESUME: this test is flaky.
             lock (_lock)
             {
-                Task.WaitAll(new Task[] { _eventRepository.AddRecord(RecordTypes.Session, GetEnumerableDataFor(RecordTypes.Session)) });
-                Task.WaitAll(new Task[] { _eventRepository.AddRecord(RecordTypes.Session, GetEnumerableDataFor(RecordTypes.Session)) });
+                Task.WaitAll(new Task[] { _eventRepository.AddRecord(RecordTypes.Session, GetNew(RecordTypes.Session)) });
+                Task.WaitAll(new Task[] { _eventRepository.AddRecord(RecordTypes.Session, GetNew(RecordTypes.Session)) });
                 List<Session> result = _eventRepository.GetAllSessions().Result;
                 Assert.AreEqual(2, result.Count);
                 ValidateEventRecord(result[0], RecordTypes.Session);
@@ -65,63 +66,26 @@ namespace UnitTests
         {
             lock (_lock)
             {
-                // All the helper functions are for itinerary; the thing that needs all the others.
-                void AddRecord(RecordTypes recordType)
+                IEventRecord eventObject = rt switch
                 {
-                    Task.WaitAll(new Task[] { _eventRepository.AddRecord(recordType, GetEnumerableDataFor(recordType)) });
-                }
+                    RecordTypes.Itinerary => GetNewItinerary(),
+                    RecordTypes.Registrant => GetNewRegistrant(),
+                    RecordTypes.Registration => GetNewRegistration(),
+                    RecordTypes.Session => GetNewSession(),
+                    _ => null
+                };
 
-                // add record of the given type
-                AddRecord(rt);
-
-                // retrieve by id (should have fresh ids)
-                var eventRecord = GetEventRecord(rt);
-                Assert.IsNotNull(eventRecord);
-
-                void AddNewSession()
+                int newId = rt switch
                 {
-                    AddRecord(RecordTypes.Session);
-                    _eventRepository.AddSession(GetEventRecord(RecordTypes.Session) as Session).Wait();
-                }
-                void AddNewRegistrant() => _eventRepository.AddRecord(RecordTypes.Registrant, GetEnumerableDataFor(RecordTypes.Registrant)).Wait();
-                void AddNewRegistration()
-                {
-                    AddNewRegistrant();
-                    var registrantRecord = GetEventRecord(RecordTypes.Registrant);
-                    var registration = new Registration { RegistrantId = registrantRecord.Id };
-                    _eventRepository.AddRegistration(registration).Wait();
-                }
-
-                // Save it as a new typed object.
-                switch (rt)
-                {
-                    case RecordTypes.Itinerary:
-                        // must first add related registrant, registration, session, all the things.
-                        AddNewSession();
-                        AddNewRegistration();
-                        var registrationRecord = GetEventRecord(RecordTypes.Registrant);
-                        var i = eventRecord as Itinerary;
-                        i.RegistrationId = registrationRecord.Id;
-                        var sessionRecord = GetEventRecord(RecordTypes.Session);
-                        Assert.IsNotNull(i.SessionList);
-                        i.SessionList.Add(sessionRecord as Session);
-                        Assert.IsTrue(_eventRepository.AddItinerary(i).Result);
-                        break;
-                    case RecordTypes.Registrant:
-                        _eventRepository.AddRegistrant(eventRecord as Registrant).Wait();
-                        break;
-                    case RecordTypes.Registration:
-                        _eventRepository.AddRegistration(eventRecord as Registration).Wait();
-                        break;
-                    case RecordTypes.Session:
-                        AddNewSession();
-                        break;
-                    default:
-                        throw new NotImplementedException(rt.ToString());
-                }
+                    RecordTypes.Itinerary => _eventRepository.AddRecord(RecordTypes.Itinerary, eventObject).Result,
+                    RecordTypes.Registrant => _eventRepository.AddRecord(RecordTypes.Registrant, eventObject).Result,
+                    RecordTypes.Registration => _eventRepository.AddRecord(RecordTypes.Registration, eventObject).Result,
+                    RecordTypes.Session => _eventRepository.AddRecord(RecordTypes.Session, eventObject).Result,
+                    _ => 0
+                };
 
                 // retrieve it; ensure it was saved correctly
-                eventRecord = GetEventRecord(rt, eventRecord.Id.ToString());
+                var eventRecord = GetEventRecord(rt, newId);
                 ValidateEventRecord(eventRecord, rt);
             }
         }
@@ -136,17 +100,17 @@ namespace UnitTests
             lock (_lock)
             {
                 // add 2 records of the given type
-                Task.WaitAll(new Task[] { _eventRepository.AddRecord(rt, GetEnumerableDataFor(rt)) });
-                Task.WaitAll(new Task[] { _eventRepository.AddRecord(rt, GetEnumerableDataFor(rt)) });
+                Task.WaitAll(new Task[] { _eventRepository.AddRecord(rt, GetNew(rt)) });
+                Task.WaitAll(new Task[] { _eventRepository.AddRecord(rt, GetNew(rt)) });
 
                 // retrieve by id (should have fresh ids)
                 var eventRecord = GetEventRecord(rt);
                 Assert.IsNotNull(eventRecord);
-                Assert.AreEqual(int.Parse(FIRST_RECORD_ID), eventRecord.Id);
+                Assert.AreEqual(FIRST_RECORD_ID, eventRecord.Id);
                 ValidateEventRecord(eventRecord, rt);
 
                 // delete
-                Task.WaitAll(new Task[] { _eventRepository.DeleteRecord(FIRST_RECORD_ID, rt) });
+                Task.WaitAll(new Task[] { _eventRepository.DeleteRecord(FIRST_RECORD_ID.ToString(), rt) });
 
                 // retrieve nothing
                 eventRecord = GetEventRecord(rt);
@@ -160,8 +124,8 @@ namespace UnitTests
             lock (_lock)
             {
                 _eventRepository.DeleteFile(RecordTypes.Session).Wait();
-                Task.WaitAll(new Task[] { _eventRepository.AddRecord(RecordTypes.Session, GetEnumerableDataFor(RecordTypes.Session)) });
-                Task.WaitAll(new Task[] { _eventRepository.AddRecord(RecordTypes.Session, GetEnumerableDataFor(RecordTypes.Session)) });
+                Task.WaitAll(new Task[] { _eventRepository.AddRecord(RecordTypes.Session, GetNew(RecordTypes.Session)) });
+                Task.WaitAll(new Task[] { _eventRepository.AddRecord(RecordTypes.Session, GetNew(RecordTypes.Session)) });
                 List<Session> result = _eventRepository.GetAllSessions().Result;
                 Assert.AreEqual(2, result.Count);
                 // delete one and refresh.
@@ -181,8 +145,8 @@ namespace UnitTests
             {
                 _eventRepository.DeleteFile(RecordTypes.Session).Wait();
                 // Add 2 sessions
-                Task.WaitAll(new Task[] { _eventRepository.AddRecord(RecordTypes.Session, GetEnumerableDataFor(RecordTypes.Session)) });
-                Task.WaitAll(new Task[] { _eventRepository.AddRecord(RecordTypes.Session, GetEnumerableDataFor(RecordTypes.Session)) });
+                Task.WaitAll(new Task[] { _eventRepository.AddRecord(RecordTypes.Session, GetNew(RecordTypes.Session)) });
+                Task.WaitAll(new Task[] { _eventRepository.AddRecord(RecordTypes.Session, GetNew(RecordTypes.Session)) });
                 List<Session> result = _eventRepository.GetAllSessions().Result;
                 Assert.AreEqual(2, result.Count);
                 // edit; refresh.
@@ -235,7 +199,7 @@ namespace UnitTests
             }
         }
 
-        private IEventRecord GetEventRecord(RecordTypes rt, string id = FIRST_RECORD_ID)
+        private IEventRecord GetEventRecord(RecordTypes rt, int id = FIRST_RECORD_ID)
         {
             IEventRecord result = null;
             switch (rt)
@@ -260,46 +224,29 @@ namespace UnitTests
             return result;
         }
 
-        internal static IEnumerable<string> GetEnumerableDataFor(RecordTypes rt)
+        internal static IEventRecord GetNew(RecordTypes rt)
         {
-            switch (rt)
+            return rt switch
             {
-                case RecordTypes.Itinerary: return GetItineraryEnumerable();
-                case RecordTypes.Registrant: return GetRegistrantEnumerable();
-                case RecordTypes.Registration: return GetRegistrationEnumerable();
-                case RecordTypes.Session: return GetSessionEnumerable();
-                default: return Enumerable.Empty<string>();
-            }
+                RecordTypes.Itinerary => GetNewItinerary(),
+                RecordTypes.Registrant => GetNewRegistrant(),
+                RecordTypes.Registration => GetNewRegistration(),
+                RecordTypes.Session => GetNewSession(),
+                _ => null
+            };
         }
 
-        private static IEnumerable<string> GetRegistrantEnumerable()
-        {
-            yield return "firstName";
-            yield return "lastName";
-            yield return "email";
-            yield return "orgName";
-            yield return "industry";
-        }
+        private static Registrant GetNewRegistrant() => new Registrant 
+        { 
+            EmploymentInfo = new Employment { Industry = nameof(Employment.Industry), OrgName = nameof(Employment.OrgName) },
+            PersonalInfo = new Personal { Email = nameof(Personal.Email), FirstName = nameof(Personal.FirstName), LastName = nameof(Personal.LastName) }
+        };
 
-        private static IEnumerable<string> GetRegistrationEnumerable()
-        {
-            yield return FIRST_RECORD_ID; // registrant id
-        }
+        private static Registration GetNewRegistration() => new Registration { RegistrantId = FIRST_RECORD_ID };
 
-        private static IEnumerable<string> GetSessionEnumerable()
-        {
-            yield return ((int)DayOfWeek.Friday).ToString();
-            yield return "title";
-            yield return "description";
-        }
+        private static Session GetNewSession() => new Session { Day = DayOfWeek.Friday, Title = "title", Description = "description" };
 
-        private static IEnumerable<string> GetItineraryEnumerable()
-        {
-            yield return FIRST_RECORD_ID; // id
-            yield return FIRST_RECORD_ID; // registrationId
-            yield return FIRST_RECORD_ID; // SessionIds
-            yield return "2";
-        }
+        private static Itinerary GetNewItinerary() => new Itinerary { RegistrationId = FIRST_RECORD_ID, SessionIds = new List<int> { FIRST_RECORD_ID } };
 
         void ValidateSession(Session session)
         {

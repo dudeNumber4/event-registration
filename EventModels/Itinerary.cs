@@ -20,15 +20,16 @@ namespace EventModels
         /// <summary>
         /// When loaded from storage, we will only have session ids, not a fully populated SessionList.
         /// </summary>
-        public IEventRecord FromBasicRecord(List<string> record)
+        public IEventRecord FromBasicRecord(IEnumerable<string> record)
         {
-            if ((record?.Count > 2) && int.TryParse(record[0], out var id) && int.TryParse(record[1], out var registrationId))
+            var recordList = record.ToList();
+            if ((recordList?.Count > 2) && int.TryParse(recordList[0], out var id) && int.TryParse(recordList[1], out var registrationId))
             {
                 var result = new Itinerary
                 {
                     Id = id,
                     RegistrationId = registrationId,
-                    SessionIds = record.TakeLast(record.Count - 2).Select(i =>
+                    SessionIds = record.TakeLast(recordList.Count - 2).Select(i =>
                     {
                         int.TryParse(i, out var convertedId);
                         return convertedId;
@@ -39,6 +40,15 @@ namespace EventModels
             else
             {
                 return null;
+            }
+        }
+
+        public IEnumerable<string> ToBasicRecord()
+        {
+            yield return RegistrationId.ToString();
+            foreach (var id in SessionIds)
+            {
+                yield return id.ToString();
             }
         }
 

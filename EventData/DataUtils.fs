@@ -145,6 +145,7 @@ module DataUtils =
                            addRecord (EventRegistrationRecord.ItineraryRecord((id, list.[0], sessionList)))
                          else failwith (sprintf "%s: expected list length > 1" fileName)
     | _ -> failwith (sprintf "%s: unexpected value" fileName)
+    id
 
   // Pass id and the type of record.  I may want to transform these into tuples later.
   // param fileName is one of RecordTypes' file names
