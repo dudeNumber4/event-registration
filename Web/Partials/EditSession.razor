@@ -7,7 +7,7 @@
 
 @if (session == null)
 {
-  <p><em>Roading...</em></p>
+  <p><em>Loading...</em></p>
 }
 else
 {
@@ -47,7 +47,7 @@ else
 
   protected override async Task OnInitializedAsync()
   {
-    Debug.Print(nameof(OnInitializedAsync));
+    //Debug.Print(nameof(OnInitializedAsync));
     session = await SessionService.GetSession(SessionId) ?? new Session { Title = "New Session" };
   }
 

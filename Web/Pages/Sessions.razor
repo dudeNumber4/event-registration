@@ -36,42 +36,49 @@ else
     </tbody>
   </table>
   <div>
-    <button class="btn btn-primary" @onclick="DeleteAll">Delete all Sessions</button>
+    <span><button class="btn btn-primary" @onclick="DeleteAll">Delete all Sessions</button></span>
+    &nbsp;
+    <span><button class="btn btn-primary" @onclick="Add">Add Session</button></span>
   </div>
 }
 
 @code {
-  
-  List<Session> sessions;
-  int editSessionId = 0;
 
-  protected override async Task OnInitializedAsync()
-  {
-    await LoadSessions(true).ConfigureAwait(false);
-  }
+    List<Session> sessions;
+    int editSessionId = 0;
 
-  async Task DeleteAll(MouseEventArgs e)
-  {
-    await SessionService.DeleteAllSessions().ConfigureAwait(false);
-    await LoadSessions(false).ConfigureAwait(false);
-  }
+    protected override async Task OnInitializedAsync()
+    {
+      await LoadSessions(true).ConfigureAwait(false);
+    }
 
-  void EditSession(int sessionId)
-  {
-    NavigationManager.NavigateTo($"sessions/{sessionId}");
-  }
+    async Task DeleteAll(MouseEventArgs e)
+    {
+      await SessionService.DeleteAllSessions().ConfigureAwait(false);
+      await LoadSessions(false).ConfigureAwait(false);
+    }
 
-  async Task DeleteSession(MouseEventArgs e, int id)
-  {
-    await SessionService.DeleteSession(id).ConfigureAwait(false);
-    // Each time I call this, the UI updates diff (implicit binding without declaring anything).
-    // This happens for free with data held in DI services.
-    await LoadSessions(false).ConfigureAwait(false);
-  }
+    void EditSession(int sessionId)
+    {
+      NavigationManager.NavigateTo($"sessions/{sessionId}");
+    }
 
-  async Task LoadSessions(bool createNew = true)
-  {
-    sessions = await SessionService.GetAllSessions(createNew).ConfigureAwait(false);
-  }
+    async Task DeleteSession(MouseEventArgs e, int id)
+    {
+      await SessionService.DeleteSession(id).ConfigureAwait(false);
+      // Each time I call this, the UI updates diff (implicit binding without declaring anything).
+      // This happens for free with data held in DI services.
+      await LoadSessions(false).ConfigureAwait(false);
+    }
+
+    async Task LoadSessions(bool createNew = true)
+    {
+      sessions = await SessionService.GetAllSessions(createNew).ConfigureAwait(false);
+    }
+
+    void Add(MouseEventArgs args)
+    {
+      NavigationManager.NavigateTo($"sessions/add");
+    }
 
 }
