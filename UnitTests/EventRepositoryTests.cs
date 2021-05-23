@@ -177,6 +177,18 @@ namespace UnitTests
             }
         }
 
+        [TestMethod]
+        public void GetRegistrantByEmail()
+        {
+            lock (_lock)
+            {
+                var registrantId = _eventRepository.AddRecord(RecordTypes.Registrant, GetNew(RecordTypes.Registrant)).Result;
+                var registrant = _eventRepository.GetRegistrant(registrantId).Result;
+                var result = _eventRepository.GetRegistrant(registrant.PersonalInfo.Email).Result;
+                Assert.AreEqual(registrant, result);
+            }
+        }
+
         private void ValidateEventRecord(IEventRecord eventRecord, RecordTypes rt)
         {
             switch (rt)

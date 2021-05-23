@@ -9,7 +9,7 @@ namespace EventModels
     /// <summary>
     /// Registrant becomes registration upon signature.
     /// </summary>
-    public class Registration : IEventRecord
+    public record Registration : IEventRecord
     {
         public int Id { get; set; }
         public int RegistrantId { get; set; }

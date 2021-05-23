@@ -6,7 +6,7 @@ using System.Linq;
 namespace EventModels
 {
 
-    public class Employment
+    public record Employment
     {
         public string OrgName { get; set; }
         public string Industry { get; set; }

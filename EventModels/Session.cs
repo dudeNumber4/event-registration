@@ -7,7 +7,7 @@ using System.Text;
 namespace EventModels
 {
 
-    public class Session : IEventRecord
+    public record Session : IEventRecord
     {
 
         public int Id { get; set; }

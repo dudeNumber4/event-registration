@@ -158,17 +158,22 @@ module DataUtils =
     | "Itinerary.csv" -> getLineWith id (Path.Combine(dataDirectory, RecordTypes.itineraryFileName))
     | _ -> failwith (sprintf "%s: unexpected file name value" fileName)
 
-  // Load session records into list.  Start with empty list
-  let rec private loadSessions (sessionList:string List List) currentId maxId =
-    let nextSession (nextList:string List List) =
+  // Can load session, registrant, registration with this func, but not itinerary because it's a different data structure.
+  // Load records into list.  Start with empty list
+  let rec private loadRecords (list:string List List) currentId maxId fileName =
+    let nextRecord (nextList:string List List) =
       if currentId >= maxId then
         nextList
       else
-        loadSessions nextList (currentId + 1) maxId
-    let currentRecord = GetRecord (currentId.ToString()) "Session.csv"
+        loadRecords nextList (currentId + 1) maxId fileName
+    let currentRecord = GetRecord (currentId.ToString()) fileName
     match currentRecord with
-    | [] -> nextSession sessionList // blank line; skip it.
-    | _ -> nextSession (currentRecord::sessionList)
+    | [] -> nextRecord list // blank line; skip it.
+    | _ -> nextRecord (currentRecord::list)
+
+  let private GetAllRecords fileName =
+    let maxId = getMaxId (Path.Combine(dataDirectory, fileName))
+    loadRecords [] 1 maxId fileName
 
   // Pass id and the type of record.
   // param fileName is one of RecordTypes' file names
@@ -193,9 +198,8 @@ module DataUtils =
     | _ -> ()
     if (File.Exists(path)) then File.Delete(path) |> ignore
 
-  let public GetAllSessions() =
-    let maxId = getMaxId (Path.Combine(dataDirectory, RecordTypes.sessionFileName))
-    loadSessions [] 1 maxId
+  let public GetAllSessions() = GetAllRecords RecordTypes.sessionFileName
+  let public GetAllRegistrants() = GetAllRecords RecordTypes.registrantFileName
 
   let public DataFileExists() =
     let sessionPath = getDataFilePath (EventRegistrationRecord.SessionRecord(("", "", "", "")))

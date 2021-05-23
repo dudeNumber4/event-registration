@@ -14,12 +14,12 @@ namespace UnitTests
     public class SessionListTests
     {
 
-        private static SessionList GetSingleSessionList() => new SessionList
+        private static SessionList GetSingleSessionList() => new SessionList(new List<Session>())
             {
                 new Session{ Day = DayOfWeek.Sunday, Title = "Bobo Loves Cake", Description = "See him eat it", Id = 1 }
             };
 
-        private static SessionList GetMultipleSessionList() => new SessionList
+        private static SessionList GetMultipleSessionList() => new SessionList(new List<Session>())
             {
                 new Session{ Day = DayOfWeek.Sunday, Title = "Bobo Loves Cake", Description = "See him eat it", Id = 1 },
                 new Session{ Day = DayOfWeek.Monday, Title = "Who let the dogs out?", Description = "Who?", Id = 2 },
@@ -29,7 +29,7 @@ namespace UnitTests
         [TestMethod]
         public void SessionListSuggestionsDoesntBlowUpOnEmptyList()
         {
-            var sessionList = new SessionList();
+            var sessionList = new SessionList((new List<Session>()));
             var result = sessionList.GetSuggestedSessions();
             Assert.IsNotNull(result);
             Assert.AreEqual(0, result.Count);

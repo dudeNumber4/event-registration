@@ -9,6 +9,8 @@ namespace EventModels
     public class SessionList : List<Session>
     {
 
+        public SessionList(List<Session> sessions): base(sessions) { }
+
         /// <summary>
         /// Disallow multiple sessions with the same Id.
         /// </summary>
@@ -25,6 +27,10 @@ namespace EventModels
             }
         }
 
+        /// <summary>
+        /// This was intended to be some kind of random session suggestion thing.  But randomly generated sessions... wouldn't be in the main repositori.
+        /// </summary>
+        /// <returns></returns>
         public List<Session> GetSuggestedSessions()
         {
             var result = new List<Session>();

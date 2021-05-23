@@ -1,0 +1,60 @@
+﻿@using EventRegistration.Services
+@using EventModels
+@inject SessionService SessionService
+
+@if (sessions == null)
+{
+  <p><em>Loading...</em></p>
+}
+else
+{
+  <h3>Available Sessions</h3>
+  <table class="table">
+    <thead>
+      <tr>
+        <th></th>
+        <th>Day</th>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Edit</th>
+      </tr>
+    </thead>
+    <tbody>
+      @foreach (var session in sessions)
+      {
+        <tr>
+          <td>@session.Day</td>
+          <td>@session.Title</td>
+          <td>@session.Description</td>
+          <td><button @onclick="AddSession" class="btn btn-primary">Add</button></td>
+        </tr>
+      }
+    </tbody>
+  </table>
+  <div>
+    <span><button class="btn btn-primary" @onclick="Confirm">Confirm Selected Sessions</button></span>
+  </div>
+}
+
+@code {
+
+    private SessionList sessions = null;
+
+    private async Task HandleValidSubmit()
+    {
+      var sessionList = await SessionService.GetAllSessions();
+      // ToDo: get sessions that haven't been added to an existing itinerary.
+      sessions = new SessionList(sessionList);
+    }
+
+    void Confirm(MouseEventArgs args)
+    {
+
+    }
+    
+    void AddSession(MouseEventArgs args)
+    {
+      
+    }
+
+}

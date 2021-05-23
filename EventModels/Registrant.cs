@@ -5,7 +5,7 @@ using System.Linq;
 namespace EventModels
 {
 
-    public class Registrant : IEventRecord
+    public record Registrant : IEventRecord
     {
 
         public int Id { get; set; }

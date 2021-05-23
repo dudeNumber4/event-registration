@@ -9,12 +9,12 @@ namespace EventModels
     /// <summary>
     /// Registration becomes itinerary upon selecting session list and posting.
     /// </summary>
-    public class Itinerary : IEventRecord
+    public record Itinerary : IEventRecord
     {
 
         public int Id { get; set; }
         public int RegistrationId { get; set; }
-        public SessionList SessionList { get; set; } = new SessionList();
+        public SessionList SessionList { get; set; } = new SessionList(new List<Session>());
         public List<int> SessionIds { get; set; }
 
         /// <summary>

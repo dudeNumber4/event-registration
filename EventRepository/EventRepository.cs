@@ -12,7 +12,7 @@ namespace EventRepository
 {
 
     /// <summary>
-    /// async for completeness of sample.
+    /// This could quite obviously benefit from caching, not the purpose of this solution.
     /// </summary>
     public class EventRepository
     {
@@ -105,6 +105,12 @@ namespace EventRepository
             return new Registrant().FromBasicRecord(record) as Registrant;
         }
 
+        public async Task<Registrant> GetRegistrant(string email)
+        {
+            var registrants = await GetAllRegistrants();
+            return registrants.FirstOrDefault(r => r.PersonalInfo.Email == email);
+        }
+
         public async Task<Session> GetSession(int id)
         {
             var record = await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id.ToString(), RecordTypeConverter.GetFileName(RecordTypes.Session)))).ConfigureAwait(false);
@@ -115,6 +121,12 @@ namespace EventRepository
         {
             FSharpList<FSharpList<string>> dataSessions = await Task.FromResult(DataUtils.GetAllSessions()).ConfigureAwait(false);
             return GetCSharpList(dataSessions).Select(s => new Session().FromBasicRecord(s) as Session).ToList();
+        }
+        
+        public async Task<List<Registrant>> GetAllRegistrants()
+        {
+            FSharpList<FSharpList<string>> registrants = await Task.FromResult(DataUtils.GetAllRegistrants()).ConfigureAwait(false);
+            return GetCSharpList(registrants).Select(r => new Registrant().FromBasicRecord(r) as Registrant).ToList();
         }
 
         /// <summary>
