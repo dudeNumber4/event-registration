@@ -17,6 +17,8 @@ namespace EventRegistration.Services
         /// <returns></returns>
         public async Task<Registrant> GetRegistrant(string id) => await _eventRepository.GetRegistrant(int.Parse(id));
 
+        public async Task<int> AddRegistrant(Registrant r) => await _eventRepository.AddRecord(EventRepository.RecordTypes.Registrant, r);
+
     }
 
 }

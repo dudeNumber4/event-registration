@@ -5,3 +5,4 @@ packages
 .cr
 **/obj/**
 **/bin/**
+Session.csv

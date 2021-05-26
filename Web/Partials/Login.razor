@@ -1,0 +1,23 @@
+﻿@page "/login"
+@using System.Diagnostics
+@using EventRegistration.Services
+@using EventRegistration.ViewModels
+@inject RegistrantService RegistrantService
+@inject NavigationManager NavigationManager
+
+<EditForm class="form-group" Model="model">
+    <label for="exampleInputEmail1">Email address</label>
+    <InputText id="email" type="email" class="form-control" placeholder="Enter email" @bind-Value="model.Email"></InputText>
+    <button class="btn btn-primary" @onclick="@(() => LoginYo())">Submit</button>
+</EditForm>
+
+@code {
+    private EmailViewModel model = new();
+
+    void LoginYo()
+    {
+        Debug.Print(model.Email);
+        //NavigationManager.NavigateTo($"sessions/{sessionId}");
+    }
+
+}
