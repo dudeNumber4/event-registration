@@ -5,20 +5,42 @@
 @inject RegistrantService RegistrantService
 @inject NavigationManager NavigationManager
 
+@*I couldn't get the built in validation components to work here*@
 <EditForm class="form-group" Model="model">
+    @*RESUME: put these controls into a grid, then resume lower if model valid*@
+    @*<ValidationMessage For="@(() => model.ValidationMsg)" />*@
     <label for="exampleInputEmail1">Email address</label>
     <InputText id="email" type="email" class="form-control" placeholder="Enter email" @bind-Value="model.Email"></InputText>
+    <br />
     <button class="btn btn-primary" @onclick="@(() => LoginYo())">Submit</button>
+    @if (!string.IsNullOrEmpty(model.ValidationMsg))
+    {
+        <div class="alert alert-warning" role="alert">
+            @model.ValidationMsg
+        </div>
+    }
 </EditForm>
 
 @code {
-    private EmailViewModel model = new();
+    private LoginViewModel model;
+    //private EditContext editContext;
 
     void LoginYo()
     {
-        // RESUME: here and on the spec page in ON, Login View.  Looks like RegistrantService.GetRegistrant needs an overload with email.
-        Debug.Print(model.Email);
-        //NavigationManager.NavigateTo($"sessions/{sessionId}");
+        if (model.Valid())
+        {
+            Debug.Print("found");
+            //NavigationManager.NavigateTo($"sessions/{sessionId}");
+        }
+        else
+        {
+            model.ValidationMsg = "Registration not found.";
+        }
     }
 
+    protected override void OnInitialized()
+    {
+        model = new(RegistrantService);
+        //editContext = new(model);
+    }
 }
