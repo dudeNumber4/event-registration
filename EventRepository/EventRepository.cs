@@ -89,19 +89,25 @@ namespace EventRepository
         /// <param name="id"></param>
         public async Task<Itinerary> GetItinerary(int id)
         {
-            var record = await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id.ToString(), RecordTypeConverter.GetFileName(RecordTypes.Itinerary)))).ConfigureAwait(false);
+            var record = await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id.ToString(), RecordTypeConverter.GetFileName(RecordTypes.Itinerary))));
             return new Itinerary().FromBasicRecord(record) as Itinerary;
         }
 
         public async Task<Registration> GetRegistration(int id)
         {
-            var record = await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id.ToString(), RecordTypeConverter.GetFileName(RecordTypes.Registration)))).ConfigureAwait(false);
+            var record = await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id.ToString(), RecordTypeConverter.GetFileName(RecordTypes.Registration))));
             return new Registration().FromBasicRecord(record) as Registration;
+        }
+
+        public async Task<Registration> GetRegistrationByRegistrantId(int id)
+        {
+            var registrations = await GetAllRegistrations();
+            return registrations.FirstOrDefault(r => r.Id == id);
         }
 
         public async Task<Registrant> GetRegistrant(int id)
         {
-            var record = await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id.ToString(), RecordTypeConverter.GetFileName(RecordTypes.Registrant)))).ConfigureAwait(false);
+            var record = await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id.ToString(), RecordTypeConverter.GetFileName(RecordTypes.Registrant))));
             return new Registrant().FromBasicRecord(record) as Registrant;
         }
 
@@ -113,20 +119,30 @@ namespace EventRepository
 
         public async Task<Session> GetSession(int id)
         {
-            var record = await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id.ToString(), RecordTypeConverter.GetFileName(RecordTypes.Session)))).ConfigureAwait(false);
+            var record = await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id.ToString(), RecordTypeConverter.GetFileName(RecordTypes.Session))));
             return new Session().FromBasicRecord(record) as Session;
         }
 
+        /// <summary>
+        /// Apparently I wasn't thinking of performance here.
+        /// </summary>
+        /// <returns></returns>
         public async Task<List<Session>> GetAllSessions()
         {
-            FSharpList<FSharpList<string>> dataSessions = await Task.FromResult(DataUtils.GetAllSessions()).ConfigureAwait(false);
+            FSharpList<FSharpList<string>> dataSessions = await Task.FromResult(DataUtils.GetAllSessions());
             return GetCSharpList(dataSessions).Select(s => new Session().FromBasicRecord(s) as Session).ToList();
         }
         
         public async Task<List<Registrant>> GetAllRegistrants()
         {
-            FSharpList<FSharpList<string>> registrants = await Task.FromResult(DataUtils.GetAllRegistrants()).ConfigureAwait(false);
+            FSharpList<FSharpList<string>> registrants = await Task.FromResult(DataUtils.GetAllRegistrants());
             return GetCSharpList(registrants).Select(r => new Registrant().FromBasicRecord(r) as Registrant).ToList();
+        }
+
+        public async Task<List<Registration>> GetAllRegistrations()
+        {
+            FSharpList<FSharpList<string>> registrations = await Task.FromResult(DataUtils.GetAllRegistrations());
+            return GetCSharpList(registrations).Select(r => new Registration().FromBasicRecord(r) as Registration).ToList();
         }
 
         /// <summary>

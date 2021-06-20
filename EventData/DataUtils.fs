@@ -200,6 +200,7 @@ module DataUtils =
 
   let public GetAllSessions() = GetAllRecords RecordTypes.sessionFileName
   let public GetAllRegistrants() = GetAllRecords RecordTypes.registrantFileName
+  let public GetAllRegistrations() = GetAllRecords RecordTypes.registrationFileName
 
   let public DataFileExists() =
     let sessionPath = getDataFilePath (EventRegistrationRecord.SessionRecord(("", "", "", "")))

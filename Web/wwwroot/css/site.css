@@ -16,6 +16,10 @@ app {
     align-items: center;
 }
 
+.row-padding {
+    padding: .25em;
+}
+
 .main {
     flex: 1;
 }

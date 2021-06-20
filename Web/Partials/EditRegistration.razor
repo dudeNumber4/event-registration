@@ -1,7 +1,10 @@
-﻿@page "/edit-registration"
+﻿@page "/edit-registration/{RegistrationId}"
 
 @*SelectSessions & SelectedSessions components *@ 
 
 @code {
+
+    [Parameter]
+    public int RegistrationId { get; set; }
 
 }

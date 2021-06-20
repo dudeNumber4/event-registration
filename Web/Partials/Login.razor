@@ -1,46 +1,59 @@
 ﻿@page "/login"
-@using System.Diagnostics
 @using EventRegistration.Services
 @using EventRegistration.ViewModels
 @inject RegistrantService RegistrantService
+@inject RegistrationService RegistrationService
 @inject NavigationManager NavigationManager
 
 @*I couldn't get the built in validation components to work here*@
 <EditForm class="form-group" Model="model">
-    @*RESUME: put these controls into a grid, then resume lower if model valid*@
     @*<ValidationMessage For="@(() => model.ValidationMsg)" />*@
-    <label for="exampleInputEmail1">Email address</label>
-    <InputText id="email" type="email" class="form-control" placeholder="Enter email" @bind-Value="model.Email"></InputText>
-    <br />
-    <button class="btn btn-primary" @onclick="@(() => LoginYo())">Submit</button>
-    @if (!string.IsNullOrEmpty(model.ValidationMsg))
-    {
-        <div class="alert alert-warning" role="alert">
-            @model.ValidationMsg
+    <div class="container">
+        <div class="row row-padding">
+            <label for="exampleInputEmail1">Email address</label>
+            <InputText id="email" type="email" class="form-control" placeholder="Enter email" @bind-Value="model.Email"></InputText>
         </div>
-    }
+        <div class="row row-padding">
+            <button class="btn btn-primary" @onclick="@(() => LoginYo())">Submit</button>
+        </div>
+        <div class="row row-padding">
+            @if (!string.IsNullOrEmpty(model.ValidationMsg))
+            {
+                <div class="alert alert-warning" role="alert">
+                    @model.ValidationMsg
+                </div>
+            }
+        </div>
+    </div>
 </EditForm>
 
 @code {
     private LoginViewModel model;
     //private EditContext editContext;
 
-    void LoginYo()
+    async void LoginYo()
     {
-        if (model.Valid())
+        if (await model.RegistrantExists())
         {
-            Debug.Print("found");
-            //NavigationManager.NavigateTo($"sessions/{sessionId}");
+            RegistrantService.CurrentRegistrant = model.Registrant;
+            if (await model.RegistrationExists())
+            {
+                NavigationManager.NavigateTo($"itinerary/{model.Registrant.Id}");
+            }
+            else
+            {
+                NavigationManager.NavigateTo($"edit-registration/{model.Registrant.Id}");
+            }
         }
         else
         {
-            model.ValidationMsg = "Registration not found.";
+            model.ValidationMsg = "Registrant not found.";
         }
     }
 
     protected override void OnInitialized()
     {
-        model = new(RegistrantService);
+        model = new(RegistrantService, RegistrationService);
         //editContext = new(model);
     }
 }

@@ -16,6 +16,8 @@ namespace EventRegistration.Services
 
         //}
 
+        public async Task<Registration> GetRegistration(int registrantId) => await _eventRepository.GetRegistrationByRegistrantId(registrantId);
+
     }
 
 }
