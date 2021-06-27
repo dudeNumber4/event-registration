@@ -15,9 +15,8 @@ module RecordTypes =
   let registrationFileName = "Registration.csv"
 
   // id, registrationId, unbounded SessionIds
-  type ItineraryRecord = (string * string * string List)
-  let itineraryFileName = "Itinerary.csv"
+  type RegistrationTempRecord = (string * string * string List)
+  let registrationTempFileName = "Itinerary.csv"
 
-// Itinerary -> Registration + (sessions)
-// Registration -> Registrant + (I think I originally meant to add some kind of flag that the registrant has read the waiver or something)
 // Registrant (personal info)
+// Registration -> Registrant + (sessions)

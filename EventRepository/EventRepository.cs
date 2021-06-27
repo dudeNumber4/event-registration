@@ -87,10 +87,10 @@ namespace EventRepository
         /// 
         /// </summary>
         /// <param name="id"></param>
-        public async Task<Itinerary> GetItinerary(int id)
+        public async Task<RegistrationTemp> GetRegistrationTemp(int id)
         {
-            var record = await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id.ToString(), RecordTypeConverter.GetFileName(RecordTypes.Itinerary))));
-            return new Itinerary().FromBasicRecord(record) as Itinerary;
+            var record = await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id.ToString(), RecordTypeConverter.GetFileName(RecordTypes.RegistrationTemp))));
+            return new RegistrationTemp().FromBasicRecord(record) as RegistrationTemp;
         }
 
         public async Task<Registration> GetRegistration(int id)

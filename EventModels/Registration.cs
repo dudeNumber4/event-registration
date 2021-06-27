@@ -37,15 +37,6 @@ namespace EventModels
             yield return RegistrantId.ToString();
         }
 
-        public Itinerary GetItinerary(SessionList sessionList)
-        {
-            return new Itinerary
-            {
-                RegistrationId = Id,
-                SessionList = sessionList
-            };
-        }
-
     }
 
 }

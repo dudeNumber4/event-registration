@@ -35,7 +35,7 @@ namespace UnitTests
         [ClassCleanup]
         public static void ClassCleanup()
         {
-            _eventRepository.DeleteFile(RecordTypes.Itinerary).Wait();
+            _eventRepository.DeleteFile(RecordTypes.RegistrationTemp).Wait();
             _eventRepository.DeleteFile(RecordTypes.Registrant).Wait();
             _eventRepository.DeleteFile(RecordTypes.Registration).Wait();
             _eventRepository.DeleteFile(RecordTypes.Session).Wait();
@@ -61,14 +61,14 @@ namespace UnitTests
         [DataRow(RecordTypes.Registrant)]
         [DataRow(RecordTypes.Registration)]
         [DataRow(RecordTypes.Session)]
-        [DataRow(RecordTypes.Itinerary)]
+        [DataRow(RecordTypes.RegistrationTemp)]
         public void AddConcreteTypes(RecordTypes rt)
         {
             lock (_lock)
             {
                 IEventRecord eventObject = rt switch
                 {
-                    RecordTypes.Itinerary => GetNewItinerary(),
+                    RecordTypes.RegistrationTemp => GetNewRegistrationTemp(),
                     RecordTypes.Registrant => GetNewRegistrant(),
                     RecordTypes.Registration => GetNewRegistration(),
                     RecordTypes.Session => GetNewSession(),
@@ -77,7 +77,7 @@ namespace UnitTests
 
                 int newId = rt switch
                 {
-                    RecordTypes.Itinerary => _eventRepository.AddRecord(RecordTypes.Itinerary, eventObject).Result,
+                    RecordTypes.RegistrationTemp => _eventRepository.AddRecord(RecordTypes.RegistrationTemp, eventObject).Result,
                     RecordTypes.Registrant => _eventRepository.AddRecord(RecordTypes.Registrant, eventObject).Result,
                     RecordTypes.Registration => _eventRepository.AddRecord(RecordTypes.Registration, eventObject).Result,
                     RecordTypes.Session => _eventRepository.AddRecord(RecordTypes.Session, eventObject).Result,
@@ -94,7 +94,7 @@ namespace UnitTests
         [DataRow(RecordTypes.Registrant)]
         [DataRow(RecordTypes.Registration)]
         [DataRow(RecordTypes.Session)]
-        [DataRow(RecordTypes.Itinerary)]
+        [DataRow(RecordTypes.RegistrationTemp)]
         public void ProcessRecord(RecordTypes rt)
         {
             lock (_lock)
@@ -193,8 +193,8 @@ namespace UnitTests
         {
             switch (rt)
             {
-                case RecordTypes.Itinerary:
-                    ValidateItinerary(eventRecord as Itinerary);
+                case RecordTypes.RegistrationTemp:
+                    ValidateRegistrationTemp(eventRecord as RegistrationTemp);
                     break;
                 case RecordTypes.Registrant:
                     ValidateRegistrant(eventRecord as Registrant);
@@ -218,8 +218,8 @@ namespace UnitTests
             {
                 // When I had the code simply return what result is set to below, it was always null.
                 // This even though .Result is a blocking call.  Something extremely screwy with the task system going on there.
-                case RecordTypes.Itinerary:
-                    result = _eventRepository.GetItinerary(id).Result;
+                case RecordTypes.RegistrationTemp:
+                    result = _eventRepository.GetRegistrationTemp(id).Result;
                     break;
                 case RecordTypes.Registrant:
                     result = _eventRepository.GetRegistrant(id).Result;
@@ -240,7 +240,7 @@ namespace UnitTests
         {
             return rt switch
             {
-                RecordTypes.Itinerary => GetNewItinerary(),
+                RecordTypes.RegistrationTemp => GetNewRegistrationTemp(),
                 RecordTypes.Registrant => GetNewRegistrant(),
                 RecordTypes.Registration => GetNewRegistration(),
                 RecordTypes.Session => GetNewSession(),
@@ -258,7 +258,7 @@ namespace UnitTests
 
         private static Session GetNewSession() => new Session { Day = DayOfWeek.Friday, Title = "title", Description = "description" };
 
-        private static Itinerary GetNewItinerary() => new Itinerary { RegistrationId = FIRST_RECORD_ID, SessionIds = new List<int> { FIRST_RECORD_ID } };
+        private static RegistrationTemp GetNewRegistrationTemp() => new RegistrationTemp { RegistrationId = FIRST_RECORD_ID, SessionIds = new List<int> { FIRST_RECORD_ID } };
 
         void ValidateSession(Session session)
         {
@@ -275,12 +275,12 @@ namespace UnitTests
             Assert.IsTrue(registration.RegistrantId > 0);
         }
 
-        void ValidateItinerary(Itinerary itinerary)
+        void ValidateRegistrationTemp(RegistrationTemp r)
         {
-            Assert.IsNotNull(itinerary);
-            Assert.IsTrue(itinerary.Id > 0);
-            Assert.IsTrue(itinerary.RegistrationId > 0);
-            Assert.IsNotNull(itinerary.SessionIds);
+            Assert.IsNotNull(r);
+            Assert.IsTrue(r.Id > 0);
+            Assert.IsTrue(r.RegistrationId > 0);
+            Assert.IsNotNull(r.SessionIds);
         }
 
         void ValidateRegistrant(Registrant registrant)

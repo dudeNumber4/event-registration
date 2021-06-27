@@ -6,10 +6,7 @@ using System.Linq;
 namespace EventModels
 {
 
-    /// <summary>
-    /// Registration becomes itinerary upon selecting session list and posting.
-    /// </summary>
-    public record Itinerary : IEventRecord
+    public record RegistrationTemp : IEventRecord
     {
 
         public int Id { get; set; }
@@ -25,7 +22,7 @@ namespace EventModels
             var recordList = record.ToList();
             if ((recordList?.Count > 2) && int.TryParse(recordList[0], out var id) && int.TryParse(recordList[1], out var registrationId))
             {
-                var result = new Itinerary
+                var result = new RegistrationTemp
                 {
                     Id = id,
                     RegistrationId = registrationId,
