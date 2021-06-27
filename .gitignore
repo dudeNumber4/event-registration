@@ -6,3 +6,6 @@ packages
 **/obj/**
 **/bin/**
 Session.csv
+Registrant.csv
+Registration.csv
+Itinerary.csv

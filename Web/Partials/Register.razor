@@ -3,7 +3,6 @@
 @using EventRegistration.Services
 @using EventRegistration.ViewModels
 @inject RegistrantService RegistrantService
-@inject RegistrationService RegistrationService
 @inject NavigationManager NavigationManager
 
 <h3>Register</h3>
@@ -59,6 +58,6 @@
 
     protected override void OnInitialized()
     {
-        model = new(RegistrantService, RegistrationService);
+        model = new(RegistrantService);
     }
 }

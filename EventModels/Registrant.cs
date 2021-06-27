@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mail;
 
 namespace EventModels
 {
@@ -11,6 +12,12 @@ namespace EventModels
         public int Id { get; set; }
         public Personal PersonalInfo { get; set; }
         public Employment EmploymentInfo { get; set; }
+
+        public Registrant()
+        {
+            PersonalInfo = new();
+            EmploymentInfo = new();
+        }
 
         public IEventRecord FromBasicRecord(IEnumerable<string> record)
         {
@@ -47,6 +54,37 @@ namespace EventModels
         public Registration Sign()
         {
             return new Registration { RegistrantId = Id };
+        }
+
+        public (bool valid, string reason) IsValid()
+        {
+            if (ValidEmail())
+            {
+                if (!string.IsNullOrEmpty(PersonalInfo.FirstName))
+                {
+                    if (!string.IsNullOrEmpty(PersonalInfo.LastName))
+                        return (true, string.Empty);
+                    else
+                        return (false, "Last Name is Required");
+                }
+                else
+                    return (false, "First Name is Required");
+            }
+            else
+                return (false, "Invalid email address");
+        }
+
+        private bool ValidEmail()
+        {
+            try
+            {
+                new MailAddress(PersonalInfo.Email);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
     }
