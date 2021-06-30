@@ -37,7 +37,6 @@ namespace UnitTests
         {
             _eventRepository.DeleteFile(RecordTypes.RegistrationTemp).Wait();
             _eventRepository.DeleteFile(RecordTypes.Registrant).Wait();
-            _eventRepository.DeleteFile(RecordTypes.Registration).Wait();
             _eventRepository.DeleteFile(RecordTypes.Session).Wait();
         }
 
@@ -59,7 +58,6 @@ namespace UnitTests
 
         [TestMethod]
         [DataRow(RecordTypes.Registrant)]
-        [DataRow(RecordTypes.Registration)]
         [DataRow(RecordTypes.Session)]
         [DataRow(RecordTypes.RegistrationTemp)]
         public void AddConcreteTypes(RecordTypes rt)
@@ -70,7 +68,6 @@ namespace UnitTests
                 {
                     RecordTypes.RegistrationTemp => GetNewRegistrationTemp(),
                     RecordTypes.Registrant => GetNewRegistrant(),
-                    RecordTypes.Registration => GetNewRegistration(),
                     RecordTypes.Session => GetNewSession(),
                     _ => null
                 };
@@ -79,7 +76,6 @@ namespace UnitTests
                 {
                     RecordTypes.RegistrationTemp => _eventRepository.AddRecord(RecordTypes.RegistrationTemp, eventObject).Result,
                     RecordTypes.Registrant => _eventRepository.AddRecord(RecordTypes.Registrant, eventObject).Result,
-                    RecordTypes.Registration => _eventRepository.AddRecord(RecordTypes.Registration, eventObject).Result,
                     RecordTypes.Session => _eventRepository.AddRecord(RecordTypes.Session, eventObject).Result,
                     _ => 0
                 };
@@ -92,7 +88,6 @@ namespace UnitTests
 
         [TestMethod]
         [DataRow(RecordTypes.Registrant)]
-        [DataRow(RecordTypes.Registration)]
         [DataRow(RecordTypes.Session)]
         [DataRow(RecordTypes.RegistrationTemp)]
         public void ProcessRecord(RecordTypes rt)
@@ -199,9 +194,6 @@ namespace UnitTests
                 case RecordTypes.Registrant:
                     ValidateRegistrant(eventRecord as Registrant);
                     break;
-                case RecordTypes.Registration:
-                    ValidateRegistration(eventRecord as Registration);
-                    break;
                 case RecordTypes.Session:
                     ValidateSession(eventRecord as Session);
                     break;
@@ -224,9 +216,6 @@ namespace UnitTests
                 case RecordTypes.Registrant:
                     result = _eventRepository.GetRegistrant(id).Result;
                     break;
-                case RecordTypes.Registration:
-                    result = _eventRepository.GetRegistration(id).Result;
-                    break;
                 case RecordTypes.Session:
                     result = _eventRepository.GetSession(id).Result;
                     break;
@@ -236,25 +225,19 @@ namespace UnitTests
             return result;
         }
 
-        internal static IEventRecord GetNew(RecordTypes rt)
+        internal static IEventRecord GetNew(RecordTypes rt) => rt switch
         {
-            return rt switch
-            {
-                RecordTypes.RegistrationTemp => GetNewRegistrationTemp(),
-                RecordTypes.Registrant => GetNewRegistrant(),
-                RecordTypes.Registration => GetNewRegistration(),
-                RecordTypes.Session => GetNewSession(),
-                _ => null
-            };
-        }
+            RecordTypes.RegistrationTemp => GetNewRegistrationTemp(),
+            RecordTypes.Registrant => GetNewRegistrant(),
+            RecordTypes.Session => GetNewSession(),
+            _ => null
+        };
 
         private static Registrant GetNewRegistrant() => new Registrant 
         { 
             EmploymentInfo = new Employment { Industry = nameof(Employment.Industry), OrgName = nameof(Employment.OrgName) },
             PersonalInfo = new Personal { Email = nameof(Personal.Email), FirstName = nameof(Personal.FirstName), LastName = nameof(Personal.LastName) }
         };
-
-        private static Registration GetNewRegistration() => new Registration { RegistrantId = FIRST_RECORD_ID };
 
         private static Session GetNewSession() => new Session { Day = DayOfWeek.Friday, Title = "title", Description = "description" };
 
@@ -266,13 +249,6 @@ namespace UnitTests
             Assert.IsTrue(session.Id > 0);
             Assert.IsFalse(string.IsNullOrEmpty(session.Title));
             Assert.IsFalse(string.IsNullOrEmpty(session.Description));
-        }
-
-        void ValidateRegistration(Registration registration)
-        {
-            Assert.IsNotNull(registration);
-            Assert.IsTrue(registration.Id > 0);
-            Assert.IsTrue(registration.RegistrantId > 0);
         }
 
         void ValidateRegistrationTemp(RegistrationTemp r)

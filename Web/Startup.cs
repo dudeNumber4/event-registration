@@ -27,7 +27,6 @@ namespace EventRegistration
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddSingleton<SessionService>();
-            services.AddSingleton<RegistrationService>();
             services.AddSingleton<RegistrantService>();
         }
 

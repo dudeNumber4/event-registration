@@ -7,7 +7,6 @@ module DataUtils =
  
   type EventRegistrationRecord =
     | RegistrantRecord of RecordTypes.RegistrantRecord
-    | RegistrationRecord of RecordTypes.RegistrationRecord
     | SessionRecord of RecordTypes.SessionRecord
     | RegistrationTempRecord of RecordTypes.RegistrationTempRecord
 
@@ -27,7 +26,6 @@ module DataUtils =
   let private getDataFilePath record =
     match record with
     | RegistrantRecord r -> Path.Combine(dataDirectory, RecordTypes.registrantFileName)
-    | RegistrationRecord r -> Path.Combine(dataDirectory, RecordTypes.registrationFileName)
     | SessionRecord r -> Path.Combine(dataDirectory, RecordTypes.sessionFileName)
     | RegistrationTempRecord r -> Path.Combine(dataDirectory, RecordTypes.registrationTempFileName)
 
@@ -39,10 +37,6 @@ module DataUtils =
                             // sure will be nice when F# gets string interpolation
                             let csv = sprintf "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"%s" id firstName LastName Email OrgName Industry Environment.NewLine
                             File.AppendAllText(fileName, csv) |> ignore
-    | RegistrationRecord r -> ensureDataFileExists fileName |> ignore
-                              let id, RegistrantId = r
-                              let csv = sprintf "\"%s\",\"%s\"%s" id RegistrantId Environment.NewLine
-                              File.AppendAllText(fileName, csv) |> ignore
     | SessionRecord r -> ensureDataFileExists fileName |> ignore
                          let id, Day, Title, Description = r
                          let csv = sprintf "\"%s\",\"%s\",\"%s\",\"%s\"%s" id Day Title Description Environment.NewLine
@@ -121,9 +115,8 @@ module DataUtils =
     match fileName with
     // You'd think you could match on a value like RecordTypes.RegistrantRecord, but you can't
     | "Registrant.csv" -> getMaxId (Path.Combine(dataDirectory, RecordTypes.registrantFileName)) + 1
-    | "Registration.csv" -> getMaxId (Path.Combine(dataDirectory, RecordTypes.registrationFileName)) + 1
     | "Session.csv" -> getMaxId (Path.Combine(dataDirectory, RecordTypes.sessionFileName)) + 1
-    | "Itinerary.csv" -> getMaxId (Path.Combine(dataDirectory, RecordTypes.registrationTempFileName)) + 1
+    | "Registration.csv" -> getMaxId (Path.Combine(dataDirectory, RecordTypes.registrationTempFileName)) + 1
     | _ -> failwith (sprintf "%s: unexpected file name value" fileName)
 
   // param fileName is one of RecordTypes' file names
@@ -134,16 +127,13 @@ module DataUtils =
     | "Registrant.csv" -> if (list.Length = 5) then
                             addRecord (EventRegistrationRecord.RegistrantRecord((id, list.[0], list.[1], list.[2], list.[3], list.[4])))
                           else failwith (sprintf "%s: expected list length of 5" fileName)
-    | "Registration.csv" -> if (list.Length = 1) then
-                              addRecord (EventRegistrationRecord.RegistrationRecord((id, list.[0])))
-                            else failwith (sprintf "%s: expected list length of 1" fileName)
     | "Session.csv" -> if (list.Length = 3) then
                          addRecord (EventRegistrationRecord.SessionRecord((id, list.[0], list.[1], list.[2])))
                        else failwith (sprintf "%s: expected list length of 3" fileName)
-    | "Itinerary.csv" -> if (list.Length > 1) then
-                           let sessionList = List.skip 1 list  // peel off the session list
-                           addRecord (EventRegistrationRecord.RegistrationTempRecord((id, list.[0], sessionList)))
-                         else failwith (sprintf "%s: expected list length > 1" fileName)
+    | "Registration.csv" -> if (list.Length > 1) then
+                              let sessionList = List.skip 1 list  // peel off the session list
+                              addRecord (EventRegistrationRecord.RegistrationTempRecord((id, list.[0], sessionList)))
+                            else failwith (sprintf "%s: expected list length > 1" fileName)
     | _ -> failwith (sprintf "%s: unexpected value" fileName)
     id
 
@@ -153,9 +143,8 @@ module DataUtils =
     match fileName with
     // You'd think you could match on a value like RecordTypes.RegistrantRecord, but you can't
     | "Registrant.csv" -> getLineWith id (Path.Combine(dataDirectory, RecordTypes.registrantFileName))
-    | "Registration.csv" -> getLineWith id (Path.Combine(dataDirectory, RecordTypes.registrationFileName))
     | "Session.csv" -> getLineWith id (Path.Combine(dataDirectory, RecordTypes.sessionFileName))
-    | "Itinerary.csv" -> getLineWith id (Path.Combine(dataDirectory, RecordTypes.registrationTempFileName))
+    | "Registration.csv" -> getLineWith id (Path.Combine(dataDirectory, RecordTypes.registrationTempFileName))
     | _ -> failwith (sprintf "%s: unexpected file name value" fileName)
 
   // Can load session, registrant, registration with this func, but not itinerary because it's a different data structure.
@@ -181,9 +170,8 @@ module DataUtils =
     match fileName with
     // You'd think you could match on a value like RecordTypes.RegistrantRecord, but you can't
     | "Registrant.csv" -> deleteLineWith id (Path.Combine(dataDirectory, RecordTypes.registrantFileName))
-    | "Registration.csv" -> deleteLineWith id (Path.Combine(dataDirectory, RecordTypes.registrationFileName))
     | "Session.csv" -> deleteLineWith id (Path.Combine(dataDirectory, RecordTypes.sessionFileName))
-    | "Itinerary.csv" -> deleteLineWith id (Path.Combine(dataDirectory, RecordTypes.registrationTempFileName))
+    | "Registration.csv" -> deleteLineWith id (Path.Combine(dataDirectory, RecordTypes.registrationTempFileName))
     | _ -> failwith (sprintf "%s: unexpected file name value" fileName)
 
   // param fileName is one of RecordTypes' file names
@@ -192,19 +180,17 @@ module DataUtils =
     match fileName with
     // You'd think you could match on a value like RecordTypes.RegistrantRecord, but you can't
     | "Registrant.csv" -> path <- (Path.Combine(dataDirectory, RecordTypes.registrantFileName))
-    | "Registration.csv" -> path <- (Path.Combine(dataDirectory, RecordTypes.registrationFileName))
     | "Session.csv" -> path <- (Path.Combine(dataDirectory, RecordTypes.sessionFileName))
-    | "Itinerary.csv" -> path <- (Path.Combine(dataDirectory, RecordTypes.registrationTempFileName))
+    | "Registration.csv" -> path <- (Path.Combine(dataDirectory, RecordTypes.registrationTempFileName))
     | _ -> ()
     if (File.Exists(path)) then File.Delete(path) |> ignore
 
   let public GetAllSessions() = GetAllRecords RecordTypes.sessionFileName
   let public GetAllRegistrants() = GetAllRecords RecordTypes.registrantFileName
-  let public GetAllRegistrations() = GetAllRecords RecordTypes.registrationFileName
+  let public GetAllRegistrations() = GetAllRecords RecordTypes.registrationTempFileName
 
   let public DataFileExists() =
     let sessionPath = getDataFilePath (EventRegistrationRecord.SessionRecord(("", "", "", "")))
-    let registrationPath = getDataFilePath (EventRegistrationRecord.RegistrationRecord(("", "")))
     let registrantPath = getDataFilePath (EventRegistrationRecord.RegistrantRecord(("", "", "", "", "", "")))
     let registrationTempPath = getDataFilePath (EventRegistrationRecord.RegistrationTempRecord(("", "", [])))
-    File.Exists(sessionPath) || File.Exists(registrantPath) || File.Exists(registrationPath) || File.Exists(registrationTempPath)
+    File.Exists(sessionPath) || File.Exists(registrantPath) || File.Exists(registrationTempPath)

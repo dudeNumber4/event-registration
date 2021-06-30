@@ -8,7 +8,7 @@ namespace EventRepository
     /// </summary>
     public enum RecordTypes
     {
-        RegistrationTemp, Registrant, Registration, Session
+        RegistrationTemp, Registrant, Session
     }
 
     internal static class RecordTypeConverter
@@ -17,7 +17,6 @@ namespace EventRepository
         {
             RecordTypes.RegistrationTemp => EventData.RecordTypes.registrationTempFileName,
             RecordTypes.Registrant => EventData.RecordTypes.registrantFileName,
-            RecordTypes.Registration => EventData.RecordTypes.registrationFileName,
             RecordTypes.Session => EventData.RecordTypes.sessionFileName,
             _ => string.Empty
         };

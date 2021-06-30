@@ -93,18 +93,6 @@ namespace EventRepository
             return new RegistrationTemp().FromBasicRecord(record) as RegistrationTemp;
         }
 
-        public async Task<Registration> GetRegistration(int id)
-        {
-            var record = await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id.ToString(), RecordTypeConverter.GetFileName(RecordTypes.Registration))));
-            return new Registration().FromBasicRecord(record) as Registration;
-        }
-
-        public async Task<Registration> GetRegistrationByRegistrantId(int id)
-        {
-            var registrations = await GetAllRegistrations();
-            return registrations.FirstOrDefault(r => r.Id == id);
-        }
-
         public async Task<Registrant> GetRegistrant(int id)
         {
             var record = await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id.ToString(), RecordTypeConverter.GetFileName(RecordTypes.Registrant))));
@@ -139,10 +127,10 @@ namespace EventRepository
             return GetCSharpList(registrants).Select(r => new Registrant().FromBasicRecord(r) as Registrant).ToList();
         }
 
-        public async Task<List<Registration>> GetAllRegistrations()
+        public async Task<List<RegistrationTemp>> GetAllRegistrations()
         {
             FSharpList<FSharpList<string>> registrations = await Task.FromResult(DataUtils.GetAllRegistrations());
-            return GetCSharpList(registrations).Select(r => new Registration().FromBasicRecord(r) as Registration).ToList();
+            return GetCSharpList(registrations).Select(r => new RegistrationTemp().FromBasicRecord(r) as RegistrationTemp).ToList();
         }
 
         /// <summary>

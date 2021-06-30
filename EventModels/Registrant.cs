@@ -47,15 +47,6 @@ namespace EventModels
             yield return EmploymentInfo.Industry;
         }
 
-        /// <summary>
-        /// Registrant becomes registration upon signature.
-        /// </summary>
-        /// <returns></returns>
-        public Registration Sign()
-        {
-            return new Registration { RegistrantId = Id };
-        }
-
         public (bool valid, string reason) IsValid()
         {
             if (ValidEmail())
