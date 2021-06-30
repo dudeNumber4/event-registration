@@ -1,12 +1,10 @@
-﻿using EventModels;
-using EventData;
+﻿using EventData;
+using EventModels;
 using Microsoft.FSharp.Collections;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 using System.Linq;
-using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace EventRepository
 {
@@ -87,10 +85,10 @@ namespace EventRepository
         /// 
         /// </summary>
         /// <param name="id"></param>
-        public async Task<RegistrationTemp> GetRegistrationTemp(int id)
+        public async Task<Registration> GetRegistration(int id)
         {
-            var record = await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id.ToString(), RecordTypeConverter.GetFileName(RecordTypes.RegistrationTemp))));
-            return new RegistrationTemp().FromBasicRecord(record) as RegistrationTemp;
+            var record = await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id.ToString(), RecordTypeConverter.GetFileName(RecordTypes.Registration))));
+            return new Registration().FromBasicRecord(record) as Registration;
         }
 
         public async Task<Registrant> GetRegistrant(int id)
@@ -127,10 +125,10 @@ namespace EventRepository
             return GetCSharpList(registrants).Select(r => new Registrant().FromBasicRecord(r) as Registrant).ToList();
         }
 
-        public async Task<List<RegistrationTemp>> GetAllRegistrations()
+        public async Task<List<Registration>> GetAllRegistrations()
         {
             FSharpList<FSharpList<string>> registrations = await Task.FromResult(DataUtils.GetAllRegistrations());
-            return GetCSharpList(registrations).Select(r => new RegistrationTemp().FromBasicRecord(r) as RegistrationTemp).ToList();
+            return GetCSharpList(registrations).Select(r => new Registration().FromBasicRecord(r) as Registration).ToList();
         }
 
         /// <summary>
@@ -154,11 +152,7 @@ namespace EventRepository
         /// </summary>
         /// <param name="list">F# list</param>
         /// <returns>C# list</returns>
-        private List<string> GetCSharpList(FSharpList<string> list)
-        {
-            IEnumerable<string> enumerable = SeqModule.OfList(list);
-            return new List<string>(enumerable);
-        }
+        private List<string> GetCSharpList(FSharpList<string> list) => new List<string>(SeqModule.OfList(list));
 
     }
 
