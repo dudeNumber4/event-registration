@@ -184,6 +184,21 @@ namespace UnitTests
             }
         }
 
+        [TestMethod]
+        public void RegistrationShouldBeValidWithoutSessionList()
+        {
+            lock (_lock)
+            {
+                Registration r = GetNewRegistration();
+                r.SessionIds.Clear();
+                var registrationId = _eventRepository.NextId(RecordTypes.Registration);
+                r.Id = registrationId;
+                _eventRepository.AddRecord(RecordTypes.Registration, r).Wait();
+                r = _eventRepository.GetRegistration(r.Id).Result;
+                Assert.AreEqual(r.SessionIds.Count, 0);
+            }
+        }
+
         private void ValidateEventRecord(IEventRecord eventRecord, RecordTypes rt)
         {
             switch (rt)
@@ -239,9 +254,9 @@ namespace UnitTests
             PersonalInfo = new Personal { Email = nameof(Personal.Email), FirstName = nameof(Personal.FirstName), LastName = nameof(Personal.LastName) }
         };
 
-        private static Session GetNewSession() => new Session { Day = DayOfWeek.Friday, Title = "title", Description = "description" };
+        private static Session GetNewSession() => new() { Day = DayOfWeek.Friday, Title = "title", Description = "description" };
 
-        private static Registration GetNewRegistration() => new Registration { RegistrationId = FIRST_RECORD_ID, SessionIds = new List<int> { FIRST_RECORD_ID } };
+        private static Registration GetNewRegistration() => new() { Id = FIRST_RECORD_ID, RegistrationId = FIRST_RECORD_ID, SessionIds = new List<int> { FIRST_RECORD_ID } };
 
         void ValidateSession(Session session)
         {

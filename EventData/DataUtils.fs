@@ -34,18 +34,17 @@ module DataUtils =
     match record with
     | RegistrantRecord r -> ensureDataFileExists fileName |> ignore
                             let id, firstName, LastName, Email, OrgName, Industry = r
-                            // sure will be nice when F# gets string interpolation
-                            let csv = sprintf "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"%s" id firstName LastName Email OrgName Industry Environment.NewLine
+                            let csv = $"\"{id}\",\"{firstName}\",\"{LastName}\",\"{Email}\",\"{OrgName}\",\"{Industry}\"{Environment.NewLine}"
                             File.AppendAllText(fileName, csv) |> ignore
     | SessionRecord r -> ensureDataFileExists fileName |> ignore
                          let id, Day, Title, Description = r
-                         let csv = sprintf "\"%s\",\"%s\",\"%s\",\"%s\"%s" id Day Title Description Environment.NewLine
+                         let csv = $"\"{id}\",\"{Day}\",\"{Title}\",\"{Description}\"{Environment.NewLine}"
                          File.AppendAllText(fileName, csv) |> ignore
     | RegistrationRecord r -> ensureDataFileExists fileName |> ignore
                               let id, registrationId, SessionIds = r
-                              let csv = sprintf "\"%s\",\"%s\"," id registrationId
-                              // add id list to end of line
-                              let newLine = (List.fold (fun accumulator current -> sprintf "%s,\"%s\"" accumulator current) csv SessionIds) + Environment.NewLine
+                              let csv = $"\"{id}\",\"{registrationId}\","
+                              // add session id list to end of line
+                              let newLine = (List.fold (fun accumulator current -> $"{accumulator},\"{current}\"") csv SessionIds) + Environment.NewLine
                               File.AppendAllText(fileName, newLine) |> ignore
 
   // Iterate through the reader writing to the writer unless line with id is found
@@ -117,7 +116,7 @@ module DataUtils =
     | "Registrant.csv" -> getMaxId (Path.Combine(dataDirectory, RecordTypes.registrantFileName)) + 1
     | "Session.csv" -> getMaxId (Path.Combine(dataDirectory, RecordTypes.sessionFileName)) + 1
     | "Registration.csv" -> getMaxId (Path.Combine(dataDirectory, RecordTypes.registrationFileName)) + 1
-    | _ -> failwith (sprintf "%s: unexpected file name value" fileName)
+    | _ -> failwith ($"{fileName}: unexpected file name value")
 
   // param fileName is one of RecordTypes' file names
   let public AddRecord fileName (list:string List) =
@@ -126,15 +125,16 @@ module DataUtils =
     // You'd think you could match on a value like RecordTypes.RegistrantRecord, but you can't
     | "Registrant.csv" -> if (list.Length = 5) then
                             addRecord (EventRegistrationRecord.RegistrantRecord((id, list.[0], list.[1], list.[2], list.[3], list.[4])))
-                          else failwith (sprintf "%s: expected list length of 5" fileName)
+                          else failwith ($"{fileName}: expected list length of 5")
     | "Session.csv" -> if (list.Length = 3) then
                          addRecord (EventRegistrationRecord.SessionRecord((id, list.[0], list.[1], list.[2])))
-                       else failwith (sprintf "%s: expected list length of 3" fileName)
+                       else failwith ($"{fileName}: expected list length of 3")
     | "Registration.csv" -> if (list.Length > 1) then
-                              let sessionList = List.skip 1 list  // peel off the session list
+                                                                        // peel off the session list
+                              let sessionList = if (list.Length > 2) then List.skip 1 list else List.Empty
                               addRecord (EventRegistrationRecord.RegistrationRecord((id, list.[0], sessionList)))
-                            else failwith (sprintf "%s: expected list length > 1" fileName)
-    | _ -> failwith (sprintf "%s: unexpected value" fileName)
+                            else failwith ($"{fileName}: expected list length > 1")
+    | _ -> failwith ($"{fileName}: unexpected value")
     id
 
   // Pass id and the type of record.  I may want to transform these into tuples later.
@@ -145,7 +145,7 @@ module DataUtils =
     | "Registrant.csv" -> getLineWith id (Path.Combine(dataDirectory, RecordTypes.registrantFileName))
     | "Session.csv" -> getLineWith id (Path.Combine(dataDirectory, RecordTypes.sessionFileName))
     | "Registration.csv" -> getLineWith id (Path.Combine(dataDirectory, RecordTypes.registrationFileName))
-    | _ -> failwith (sprintf "%s: unexpected file name value" fileName)
+    | _ -> failwith ($"{fileName}: unexpected file name value")
 
   // Can load session, registrant, registration with this func, but not itinerary because it's a different data structure.
   // Load records into list.  Start with empty list
@@ -172,7 +172,7 @@ module DataUtils =
     | "Registrant.csv" -> deleteLineWith id (Path.Combine(dataDirectory, RecordTypes.registrantFileName))
     | "Session.csv" -> deleteLineWith id (Path.Combine(dataDirectory, RecordTypes.sessionFileName))
     | "Registration.csv" -> deleteLineWith id (Path.Combine(dataDirectory, RecordTypes.registrationFileName))
-    | _ -> failwith (sprintf "%s: unexpected file name value" fileName)
+    | _ -> failwith ($"{fileName}: unexpected file name value")
 
   // param fileName is one of RecordTypes' file names
   let public DeleteFile fileName =

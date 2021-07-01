@@ -35,7 +35,9 @@ namespace EventRepository
                 await AddRecord(rt, eventRecord).ConfigureAwait(false);
             }
         }
-        
+
+        public int NextId(RecordTypes rt) => DataUtils.NextId(RecordTypeConverter.GetFileName(rt));
+
         /// <summary>
         /// 
         /// </summary>
@@ -57,7 +59,7 @@ namespace EventRepository
         /// <param name="rt"></param>
         public async Task DeleteFile(RecordTypes rt)
         {
-            await Task.Run(() => DataUtils.DeleteFile(RecordTypeConverter.GetFileName(rt))).ConfigureAwait(false);
+            await Task.Run(() => DataUtils.DeleteFile(RecordTypeConverter.GetFileName(rt)));
         }
 
         /// <summary>
@@ -67,7 +69,7 @@ namespace EventRepository
         /// <param name="rt"></param>
         public async Task DeleteRecord(string id, RecordTypes rt)
         {
-            await Task.Run(() => DataUtils.DeleteRecord(id, RecordTypeConverter.GetFileName(rt))).ConfigureAwait(false);
+            await Task.Run(() => DataUtils.DeleteRecord(id, RecordTypeConverter.GetFileName(rt)));
         }
 
         /// <summary>
@@ -77,7 +79,7 @@ namespace EventRepository
         /// <param name="rt"></param>
         public async Task<List<string>> GetRecord(string id, RecordTypes rt)
         {
-            var result = await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id, RecordTypeConverter.GetFileName(rt)))).ConfigureAwait(false);
+            var result = await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id, RecordTypeConverter.GetFileName(rt))));
             return result;
         }
 
