@@ -4,17 +4,8 @@ module DataUtils =
   open System.Reflection
   open System.IO
   open System
+  open RecordTypes
  
-  type EventRegistrationRecord =
-    | RegistrantRecord of RecordTypes.RegistrantRecord
-    | SessionRecord of RecordTypes.SessionRecord
-    | RegistrationRecord of RecordTypes.RegistrationRecord
-
-  // A common solution root location
-  let private dataDirectory =
-    let location = Assembly.GetExecutingAssembly().Location |> Path.GetDirectoryName
-    location + "..\..\..\..\.."
-
   let private ensureDataFileExists filePath =
     if not (File.Exists(filePath)) then
       try
@@ -23,14 +14,8 @@ module DataUtils =
       with
         | :? System.FieldAccessException -> () // async, tests show create directly after check for existence fails.
 
-  let private getDataFilePath record =
-    match record with
-    | RegistrantRecord r -> Path.Combine(dataDirectory, RecordTypes.registrantFileName)
-    | SessionRecord r -> Path.Combine(dataDirectory, RecordTypes.sessionFileName)
-    | RegistrationRecord r -> Path.Combine(dataDirectory, RecordTypes.registrationFileName)
-
   let private addRecord record =
-    let fileName = getDataFilePath record
+    let fileName = DataDriver.getDataFilePath record
     match record with
     | RegistrantRecord r -> ensureDataFileExists fileName |> ignore
                             let id, firstName, LastName, Email, OrgName, Industry = r
@@ -113,9 +98,9 @@ module DataUtils =
   let public NextId fileName =
     match fileName with
     // You'd think you could match on a value like RecordTypes.RegistrantRecord, but you can't
-    | "Registrant.csv" -> getMaxId (Path.Combine(dataDirectory, RecordTypes.registrantFileName)) + 1
-    | "Session.csv" -> getMaxId (Path.Combine(dataDirectory, RecordTypes.sessionFileName)) + 1
-    | "Registration.csv" -> getMaxId (Path.Combine(dataDirectory, RecordTypes.registrationFileName)) + 1
+    | "Registrant.csv" -> getMaxId (Path.Combine(DataDriver.DataPath, RecordTypes.registrantFileName)) + 1
+    | "Session.csv" -> getMaxId (Path.Combine(DataDriver.DataPath, RecordTypes.sessionFileName)) + 1
+    | "Registration.csv" -> getMaxId (Path.Combine(DataDriver.DataPath, RecordTypes.registrationFileName)) + 1
     | _ -> failwith ($"{fileName}: unexpected file name value")
 
   // param fileName is one of RecordTypes' file names
@@ -142,9 +127,9 @@ module DataUtils =
   let public GetRecord id fileName =
     match fileName with
     // You'd think you could match on a value like RecordTypes.RegistrantRecord, but you can't
-    | "Registrant.csv" -> getLineWith id (Path.Combine(dataDirectory, RecordTypes.registrantFileName))
-    | "Session.csv" -> getLineWith id (Path.Combine(dataDirectory, RecordTypes.sessionFileName))
-    | "Registration.csv" -> getLineWith id (Path.Combine(dataDirectory, RecordTypes.registrationFileName))
+    | "Registrant.csv" -> getLineWith id (Path.Combine(DataDriver.DataPath, RecordTypes.registrantFileName))
+    | "Session.csv" -> getLineWith id (Path.Combine(DataDriver.DataPath, RecordTypes.sessionFileName))
+    | "Registration.csv" -> getLineWith id (Path.Combine(DataDriver.DataPath, RecordTypes.registrationFileName))
     | _ -> failwith ($"{fileName}: unexpected file name value")
 
   // Can load session, registrant, registration with this func, but not itinerary because it's a different data structure.
@@ -161,7 +146,7 @@ module DataUtils =
     | _ -> nextRecord (currentRecord::list)
 
   let private GetAllRecords fileName =
-    let maxId = getMaxId (Path.Combine(dataDirectory, fileName))
+    let maxId = getMaxId (Path.Combine(DataDriver.DataPath, fileName))
     loadRecords [] 1 maxId fileName
 
   // Pass id and the type of record.
@@ -169,28 +154,11 @@ module DataUtils =
   let public DeleteRecord id fileName =
     match fileName with
     // You'd think you could match on a value like RecordTypes.RegistrantRecord, but you can't
-    | "Registrant.csv" -> deleteLineWith id (Path.Combine(dataDirectory, RecordTypes.registrantFileName))
-    | "Session.csv" -> deleteLineWith id (Path.Combine(dataDirectory, RecordTypes.sessionFileName))
-    | "Registration.csv" -> deleteLineWith id (Path.Combine(dataDirectory, RecordTypes.registrationFileName))
+    | "Registrant.csv" -> deleteLineWith id (Path.Combine(DataDriver.DataPath, RecordTypes.registrantFileName))
+    | "Session.csv" -> deleteLineWith id (Path.Combine(DataDriver.DataPath, RecordTypes.sessionFileName))
+    | "Registration.csv" -> deleteLineWith id (Path.Combine(DataDriver.DataPath, RecordTypes.registrationFileName))
     | _ -> failwith ($"{fileName}: unexpected file name value")
-
-  // param fileName is one of RecordTypes' file names
-  let public DeleteFile fileName =
-    let mutable path = ""
-    match fileName with
-    // You'd think you could match on a value like RecordTypes.RegistrantRecord, but you can't
-    | "Registrant.csv" -> path <- (Path.Combine(dataDirectory, RecordTypes.registrantFileName))
-    | "Session.csv" -> path <- (Path.Combine(dataDirectory, RecordTypes.sessionFileName))
-    | "Registration.csv" -> path <- (Path.Combine(dataDirectory, RecordTypes.registrationFileName))
-    | _ -> ()
-    if (File.Exists(path)) then File.Delete(path) |> ignore
 
   let public GetAllSessions() = GetAllRecords RecordTypes.sessionFileName
   let public GetAllRegistrants() = GetAllRecords RecordTypes.registrantFileName
   let public GetAllRegistrations() = GetAllRecords RecordTypes.registrationFileName
-
-  let public DataFileExists() =
-    let sessionPath = getDataFilePath (EventRegistrationRecord.SessionRecord(("", "", "", "")))
-    let registrantPath = getDataFilePath (EventRegistrationRecord.RegistrantRecord(("", "", "", "", "", "")))
-    let registrationTempPath = getDataFilePath (EventRegistrationRecord.RegistrationRecord(("", "", [])))
-    File.Exists(sessionPath) || File.Exists(registrantPath) || File.Exists(registrationTempPath)

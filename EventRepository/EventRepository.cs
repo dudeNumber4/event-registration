@@ -15,8 +15,6 @@ namespace EventRepository
     public class EventRepository
     {
 
-        public bool DataFileExists() => DataUtils.DataFileExists();
-
         public async Task UpdateRecord(IEventRecord eventRecord, RecordTypes rt)
         {
             if (eventRecord == null)
@@ -57,31 +55,21 @@ namespace EventRepository
         /// 
         /// </summary>
         /// <param name="rt"></param>
-        public async Task DeleteFile(RecordTypes rt)
-        {
-            await Task.Run(() => DataUtils.DeleteFile(RecordTypeConverter.GetFileName(rt)));
-        }
+        public async Task DeleteFile(RecordTypes rt) => await Task.Run(() => DataDriver.DeleteFile(RecordTypeConverter.GetFileName(rt)));
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="id"></param>
         /// <param name="rt"></param>
-        public async Task DeleteRecord(string id, RecordTypes rt)
-        {
-            await Task.Run(() => DataUtils.DeleteRecord(id, RecordTypeConverter.GetFileName(rt)));
-        }
+        public async Task DeleteRecord(string id, RecordTypes rt) => await Task.Run(() => DataUtils.DeleteRecord(id, RecordTypeConverter.GetFileName(rt)));
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="id"></param>
         /// <param name="rt"></param>
-        public async Task<List<string>> GetRecord(string id, RecordTypes rt)
-        {
-            var result = await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id, RecordTypeConverter.GetFileName(rt))));
-            return result;
-        }
+        public async Task<List<string>> GetRecord(string id, RecordTypes rt) => await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id, RecordTypeConverter.GetFileName(rt))));
 
         /// <summary>
         /// 

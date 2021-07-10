@@ -23,14 +23,7 @@ namespace UnitTests
         private static EventRepo _eventRepository;
 
         [ClassInitialize]
-        public static void ClassInit(TestContext tc)
-        {
-            _eventRepository = new EventRepo();
-            if (_eventRepository.DataFileExists())
-            {
-                throw new Exception("A data file already exists in root of solution");
-            }
-        }
+        public static void ClassInit(TestContext tc) => _eventRepository = new EventRepo();
 
         [ClassCleanup]
         public static void ClassCleanup()

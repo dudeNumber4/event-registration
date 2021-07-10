@@ -5,9 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="StringUtils.fs" />
     <Compile Include="RecordTypes.fs" />
-    <Compile Include="DataUtils.fs" />
+    <Compile Include="DataDriver.fs" />
+    <Compile Include="StringUtils.fs" />
+    <Compile Include="DataFiles.fs" />
   </ItemGroup>
 
 </Project>

@@ -16,3 +16,7 @@ module RecordTypes =
 
 // Registrant (personal info)
 // Registration -> Registrant + (sessions)
+  type EventRegistrationRecord =
+    | RegistrantRecord of RegistrantRecord
+    | SessionRecord of SessionRecord
+    | RegistrationRecord of RegistrationRecord
