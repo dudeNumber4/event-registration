@@ -11,7 +11,12 @@ namespace EventModels
 
         public int Id { get; set; }
         public int RegistrationId { get; set; }
+
+        /// <summary>
+        /// I don't know wtf this is for now.
+        /// </summary>
         public SessionList SessionList { get; set; } = new SessionList(new List<Session>());
+
         public List<int> SessionIds { get; set; }
 
         /// <summary>
@@ -42,7 +47,6 @@ namespace EventModels
 
         public IEnumerable<string> ToBasicRecord()
         {
-            yield return Id.ToString();
             yield return RegistrationId.ToString();
             foreach (var id in SessionIds)
             {

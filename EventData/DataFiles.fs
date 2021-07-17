@@ -103,24 +103,29 @@ module DataUtils =
     | "Registration.csv" -> getMaxId (Path.Combine(DataDriver.DataPath, RecordTypes.registrationFileName)) + 1
     | _ -> failwith ($"{fileName}: unexpected file name value")
 
+  let private AddRecordWithId fileName (list:string List) id =
+    // nextId must be >= to id
+    if (NextId fileName >= id) then
+      match fileName with
+      // You'd think you could match on a value like RecordTypes.RegistrantRecord, but you can't
+      | "Registrant.csv" -> if (list.Length = 5) then
+                              addRecord (EventRegistrationRecord.RegistrantRecord((id.ToString(), list.[0], list.[1], list.[2], list.[3], list.[4])))
+                            else failwith ($"{fileName}: expected list length of 5")
+      | "Session.csv" -> if (list.Length = 3) then
+                           addRecord (EventRegistrationRecord.SessionRecord((id.ToString(), list.[0], list.[1], list.[2])))
+                         else failwith ($"{fileName}: expected list length of 3")
+      | "Registration.csv" -> if (list.Length > 1) then
+                                                                          // peel off the session list
+                                let sessionList = if (list.Length > 2) then List.skip 1 list else List.Empty
+                                addRecord (EventRegistrationRecord.RegistrationRecord((id.ToString(), list.[0], sessionList)))
+                              else failwith ($"{fileName}: expected list length > 1")
+      | _ -> failwith ($"{fileName}: unexpected value")
+      id
+    else failwith $"Id {id} already present"
+
   // param fileName is one of RecordTypes' file names
   let public AddRecord fileName (list:string List) =
-    let id = (NextId fileName).ToString()
-    match fileName with
-    // You'd think you could match on a value like RecordTypes.RegistrantRecord, but you can't
-    | "Registrant.csv" -> if (list.Length = 5) then
-                            addRecord (EventRegistrationRecord.RegistrantRecord((id, list.[0], list.[1], list.[2], list.[3], list.[4])))
-                          else failwith ($"{fileName}: expected list length of 5")
-    | "Session.csv" -> if (list.Length = 3) then
-                         addRecord (EventRegistrationRecord.SessionRecord((id, list.[0], list.[1], list.[2])))
-                       else failwith ($"{fileName}: expected list length of 3")
-    | "Registration.csv" -> if (list.Length > 1) then
-                                                                        // peel off the session list
-                              let sessionList = if (list.Length > 2) then List.skip 1 list else List.Empty
-                              addRecord (EventRegistrationRecord.RegistrationRecord((id, list.[0], sessionList)))
-                            else failwith ($"{fileName}: expected list length > 1")
-    | _ -> failwith ($"{fileName}: unexpected value")
-    id
+    AddRecordWithId fileName list (NextId fileName)
 
   // Pass id and the type of record.  I may want to transform these into tuples later.
   // param fileName is one of RecordTypes' file names
@@ -158,6 +163,11 @@ module DataUtils =
     | "Session.csv" -> deleteLineWith id (Path.Combine(DataDriver.DataPath, RecordTypes.sessionFileName))
     | "Registration.csv" -> deleteLineWith id (Path.Combine(DataDriver.DataPath, RecordTypes.registrationFileName))
     | _ -> failwith ($"{fileName}: unexpected file name value")
+
+  let public UpdateRecord fileName (list:string List) =
+    let id = List.head list
+    DeleteRecord id fileName |> ignore
+    AddRecordWithId fileName (List.tail list) (Convert.ToInt32(id))
 
   let public GetAllSessions() = GetAllRecords RecordTypes.sessionFileName
   let public GetAllRegistrants() = GetAllRecords RecordTypes.registrantFileName

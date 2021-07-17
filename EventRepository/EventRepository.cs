@@ -15,6 +15,12 @@ namespace EventRepository
     public class EventRepository
     {
 
+        public EventRepository(IDataPreparer dataPreparer)
+        {
+            dataPreparer = dataPreparer ?? new DefaultDataPreparer();
+            dataPreparer.Prepare();
+        }
+
         public async Task UpdateRecord(IEventRecord eventRecord, RecordTypes rt)
         {
             if (eventRecord == null)
@@ -23,14 +29,12 @@ namespace EventRepository
             }
             else
             {
-                // Delete and re-add
-                var existing = await GetRecord(eventRecord.Id.ToString(), rt);
+                int id = eventRecord.Id;
+                var existing = await GetRecord(id.ToString(), rt);
                 if (existing.Any())
-                {
-                    await DeleteRecord(eventRecord.Id.ToString(), rt).ConfigureAwait(false);
-                }
-
-                await AddRecord(rt, eventRecord).ConfigureAwait(false);
+                    DataUtils.UpdateRecord(RecordTypeConverter.GetFileName(rt), GetFSharpList(eventRecord.ToFullRecord()));
+                else
+                    throw new Exception($"{nameof(UpdateRecord)}: record of type {rt} with id {id} not found.");
             }
         }
 
@@ -45,10 +49,9 @@ namespace EventRepository
         {
             return await Task.Run(() =>
             {
-                FSharpList<string> recordValues = ListModule.OfSeq(record.ToBasicRecord());
-                string newId = DataUtils.AddRecord(RecordTypeConverter.GetFileName(rt), recordValues);
-                return Convert.ToInt32(newId);
-            }).ConfigureAwait(false);
+                FSharpList<string> recordValues = GetFSharpList(record.ToBasicRecord());
+                return DataUtils.AddRecord(RecordTypeConverter.GetFileName(rt), recordValues);
+            });
         }
 
         /// <summary>
@@ -143,6 +146,8 @@ namespace EventRepository
         /// <param name="list">F# list</param>
         /// <returns>C# list</returns>
         private List<string> GetCSharpList(FSharpList<string> list) => new List<string>(SeqModule.OfList(list));
+
+        private FSharpList<string> GetFSharpList(IEnumerable<string> list) => ListModule.OfSeq(list);
 
     }
 

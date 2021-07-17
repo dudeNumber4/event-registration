@@ -3,6 +3,7 @@ using EventRepository;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using EventRepo = EventRepository.EventRepository;
@@ -23,29 +24,20 @@ namespace UnitTests
         private static EventRepo _eventRepository;
 
         [ClassInitialize]
-        public static void ClassInit(TestContext tc) => _eventRepository = new EventRepo();
-
-        [ClassCleanup]
-        public static void ClassCleanup()
-        {
-            _eventRepository.DeleteFile(RecordTypes.Registration).Wait();
-            _eventRepository.DeleteFile(RecordTypes.Registrant).Wait();
-            _eventRepository.DeleteFile(RecordTypes.Session).Wait();
-        }
+        public static void ClassInit(TestContext tc) => _eventRepository = new EventRepo(new TempDataPreparer());
 
         [TestMethod]
         public void GetAllSessions()
         {
             lock (_lock)
             {
-                _eventRepository.DeleteFile(RecordTypes.Session).Wait();
                 Task.WaitAll(new Task[] { _eventRepository.AddRecord(RecordTypes.Session, GetNew(RecordTypes.Session)) });
                 Task.WaitAll(new Task[] { _eventRepository.AddRecord(RecordTypes.Session, GetNew(RecordTypes.Session)) });
                 List<Session> result = _eventRepository.GetAllSessions().Result;
-                Assert.AreEqual(2, result.Count);
-                ValidateEventRecord(result[0], RecordTypes.Session);
-                ValidateEventRecord(result[1], RecordTypes.Session);
-                Assert.AreNotEqual(result[0].Id, result[1].Id);
+                Assert.IsTrue(result.Count >= 2);
+                ValidateEventRecord(result[result.Count - 2], RecordTypes.Session);
+                ValidateEventRecord(result[result.Count - 1], RecordTypes.Session);
+                Assert.AreNotEqual(result[result.Count - 2].Id, result[result.Count - 1].Id);
             }
         }
 
@@ -111,15 +103,15 @@ namespace UnitTests
         {
             lock (_lock)
             {
-                _eventRepository.DeleteFile(RecordTypes.Session).Wait();
                 Task.WaitAll(new Task[] { _eventRepository.AddRecord(RecordTypes.Session, GetNew(RecordTypes.Session)) });
                 Task.WaitAll(new Task[] { _eventRepository.AddRecord(RecordTypes.Session, GetNew(RecordTypes.Session)) });
                 List<Session> result = _eventRepository.GetAllSessions().Result;
-                Assert.AreEqual(2, result.Count);
+                var sessionCount = result.Count;
+                Assert.IsTrue(sessionCount >= 2);
                 // delete one and refresh.
                 _eventRepository.DeleteRecord(result[0].Id.ToString(), RecordTypes.Session).Wait();
                 result = _eventRepository.GetAllSessions().Result;
-                Assert.AreEqual(1, result.Count);
+                Assert.IsTrue(result.Count == (sessionCount - 1));
             }
         }
 
@@ -127,25 +119,24 @@ namespace UnitTests
         public void UpdateSession()
         {
             const DayOfWeek testDay = DayOfWeek.Monday;
-            const string testTitle = "titl";
-            const string testDesc = "descr";
+            const string testTitle = nameof(testTitle);
+            const string testDesc = nameof(testDesc);
             lock (_lock)
             {
-                _eventRepository.DeleteFile(RecordTypes.Session).Wait();
                 // Add 2 sessions
                 Task.WaitAll(new Task[] { _eventRepository.AddRecord(RecordTypes.Session, GetNew(RecordTypes.Session)) });
                 Task.WaitAll(new Task[] { _eventRepository.AddRecord(RecordTypes.Session, GetNew(RecordTypes.Session)) });
                 List<Session> result = _eventRepository.GetAllSessions().Result;
-                Assert.AreEqual(2, result.Count);
+                Assert.IsTrue(result.Count >= 2);
                 // edit; refresh.
-                Session session = result[0];
+                Session session = result[result.Count - 1];
                 int initialSessionId = session.Id;
                 session.Day = testDay;
                 session.Description = testDesc;
                 session.Title = testTitle;
-                _eventRepository.UpdateRecord(result[0], RecordTypes.Session).Wait();
+                _eventRepository.UpdateRecord(session, RecordTypes.Session).Wait();
                 result = _eventRepository.GetAllSessions().Result;
-                Assert.AreEqual(2, result.Count);
+                Assert.IsTrue(result.Count >= 2);
                 session = result.FirstOrDefault(s => s.Title == testTitle);
                 Assert.IsNotNull(session);
                 Assert.AreEqual(initialSessionId, session.Id);

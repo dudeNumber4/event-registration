@@ -20,5 +20,16 @@ namespace EventModels
         /// </summary>
         /// <returns>The goods to pass to the storage layer.</returns>
         IEnumerable<string> ToBasicRecord();
+        
+        /// <summary>
+        /// Including Id.
+        /// </summary>
+        IEnumerable<string> ToFullRecord()
+        {
+            yield return Id.ToString();
+            foreach (var s in ToBasicRecord())
+                yield return s;
+        }
+
     }
 }

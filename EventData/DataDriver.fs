@@ -18,10 +18,6 @@ module DataDriver =
     | SessionRecord r -> Path.Combine(DataPath, RecordTypes.sessionFileName)
     | RegistrationRecord r -> Path.Combine(DataPath, RecordTypes.registrationFileName)
 
-  let private FlushFile fileName =
-    let fullPath = Path.Combine(DataPath, fileName)
-    if (File.Exists fullPath) then File.Delete fullPath
-  
   let public Set (path) = DataPath <- path
   
   // param fileName is one of RecordTypes' file names
@@ -35,7 +31,8 @@ module DataDriver =
     | _ -> ()
     if (File.Exists(path)) then File.Delete(path) |> ignore
 
-  let public Flush = 
-    FlushFile RecordTypes.sessionFileName
-    FlushFile RecordTypes.registrantFileName
-    FlushFile RecordTypes.registrationFileName
+  let public Flush() = 
+    DeleteFile RecordTypes.sessionFileName
+    DeleteFile RecordTypes.registrantFileName
+    DeleteFile RecordTypes.registrationFileName
+    |> ignore
