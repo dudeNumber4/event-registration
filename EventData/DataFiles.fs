@@ -114,11 +114,11 @@ module DataUtils =
       | "Session.csv" -> if (list.Length = 3) then
                            addRecord (EventRegistrationRecord.SessionRecord((id.ToString(), list.[0], list.[1], list.[2])))
                          else failwith ($"{fileName}: expected list length of 3")
-      | "Registration.csv" -> if (list.Length > 1) then
+      | "Registration.csv" -> if (list.Length > 0) then
                                                                           // peel off the session list
-                                let sessionList = if (list.Length > 2) then List.skip 1 list else List.Empty
+                                let sessionList = if (list.Length > 1) then List.skip 1 list else List.Empty
                                 addRecord (EventRegistrationRecord.RegistrationRecord((id.ToString(), list.[0], sessionList)))
-                              else failwith ($"{fileName}: expected list length > 1")
+                              else failwith ($"{fileName}: expected list length > 0")
       | _ -> failwith ($"{fileName}: unexpected value")
       id
     else failwith $"Id {id} already present"

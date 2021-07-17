@@ -169,18 +169,13 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void RegistrationShouldBeValidWithoutSessionList()
+        public async Task RegistrationShouldBeValidWithoutSessionList()
         {
-            lock (_lock)
-            {
-                Registration r = GetNewRegistration();
-                r.SessionIds.Clear();
-                var registrationId = _eventRepository.NextId(RecordTypes.Registration);
-                r.Id = registrationId;
-                _eventRepository.AddRecord(RecordTypes.Registration, r).Wait();
-                r = _eventRepository.GetRegistration(r.Id).Result;
-                Assert.AreEqual(r.SessionIds.Count, 0);
-            }
+            Registration r = GetNewRegistration();
+            r.SessionIds.Clear();
+            var registrationId = await _eventRepository.AddRecord(RecordTypes.Registration, r);
+            r = _eventRepository.GetRegistration(registrationId).Result;
+            Assert.AreEqual(r.SessionIds.Count, 0);
         }
 
         private void ValidateEventRecord(IEventRecord eventRecord, RecordTypes rt)

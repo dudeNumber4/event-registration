@@ -41,7 +41,7 @@ namespace EventRepository
         public int NextId(RecordTypes rt) => DataUtils.NextId(RecordTypeConverter.GetFileName(rt));
 
         /// <summary>
-        /// 
+        /// Assumes NEW record; no incoming id respected.
         /// </summary>
         /// <param name="rt"></param>
         /// <param name="recordContents">Fields for the record.</param>
