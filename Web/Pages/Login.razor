@@ -2,6 +2,7 @@
 @using EventRegistration.Services
 @using EventRegistration.ViewModels
 @inject RegistrantService RegistrantService
+@inject RegistrationService RegistrationService
 @inject NavigationManager NavigationManager
 
 @*I couldn't get the built in validation components to work here*@
@@ -35,14 +36,14 @@
         if (await model.RegistrantExists())
         {
             RegistrantService.CurrentRegistrant = model.Registrant;
-            //if (await model.RegistrationExists())
-            //{
-            //    NavigationManager.NavigateTo($"itinerary/{model.Registrant.Id}");
-            //}
-            //else
-            //{
-            //    NavigationManager.NavigateTo($"edit-registration/{model.Registrant.Id}");
-            //}
+            if (await model.RegistrationExists())
+            {
+                NavigationManager.NavigateTo($"itinerary/{model.Registrant.Id}");
+            }
+            else
+            {
+                NavigationManager.NavigateTo($"edit-registration/{model.Registrant.Id}");
+            }
         }
         else
         {
@@ -52,7 +53,7 @@
 
     protected override void OnInitialized()
     {
-        model = new(RegistrantService);
+        model = new(RegistrantService, RegistrationService);
         //editContext = new(model);
     }
 }

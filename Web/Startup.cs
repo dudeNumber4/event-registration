@@ -28,6 +28,7 @@ namespace EventRegistration
             services.AddServerSideBlazor();
             services.AddSingleton<SessionService>();
             services.AddSingleton<RegistrantService>();
+            services.AddSingleton<RegistrationService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

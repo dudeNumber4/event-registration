@@ -1,9 +1,7 @@
 ﻿using EventModels;
 using EventRegistration.Services;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Net.Mail;
 using System.Threading.Tasks;
 
 namespace EventRegistration.ViewModels
@@ -25,11 +23,11 @@ namespace EventRegistration.ViewModels
             {
                 if (!(await _registrantService.RegistrantExists(Registrant)))
                 {
-                    await _registrantService.AddRegistrant(Registrant);
+                    Registrant.Id = await _registrantService.AddRegistrant(Registrant);
                     return true;
                 }
                 else
-                    ValidationMsg = "Registration already exists";
+                    ValidationMsg = "Registration already exists, please login";
             }
             else
                 ValidationMsg = reason;

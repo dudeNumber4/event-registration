@@ -6,16 +6,23 @@ using System.Threading.Tasks;
 
 namespace EventRegistration.ViewModels
 {
+    
     public class LoginViewModel
     {
+        
         private RegistrantService _registrantService;
+        private RegistrationService _registrationService;
 
         [Required]
         public string Email { get; set; }
         public string ValidationMsg { get; set; }
         public Registrant Registrant { get; set; }
 
-        public LoginViewModel(RegistrantService registrantService) => _registrantService = registrantService;
+        public LoginViewModel(RegistrantService registrantService, RegistrationService registrationService)
+        {
+            _registrantService = registrantService;
+            _registrationService = registrationService;
+        }
 
         public async Task<bool> RegistrantExists()
         {
@@ -23,17 +30,14 @@ namespace EventRegistration.ViewModels
             return Registrant != null;
         }
 
-        //public async Task<bool> RegistrationExists()
-        //{
-        //    if (Registrant == null)
-        //    {
-        //        return false;
-        //    }
-        //    else
-        //    {
-        //        return await _registrationService.GetRegistration(Registrant.Id) != null;
-        //    }
-        //}
+        public async Task<bool> RegistrationExists()
+        {
+            if (Registrant == null)
+                return false;
+            else
+                return await _registrationService.RegistrationExists(Registrant.Id);
+        }
 
     }
+
 }
