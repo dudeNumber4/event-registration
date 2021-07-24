@@ -30,10 +30,8 @@ namespace EventRegistration.Services
             await _eventRepository.UpdateRecord(s, RecordTypes.Session).ConfigureAwait(false);
         }
 
-        public async Task AddSession(Session s)
-        {
-            await _eventRepository.AddRecord(RecordTypes.Session, s);
-        }
+        public async Task<int> AddSession(Session s) => await _eventRepository.AddRecord(RecordTypes.Session, s);
+        public async Task UpdateSession(Session s) => await _eventRepository.UpdateRecord(s, RecordTypes.Session);
 
         /// <summary>
         /// 

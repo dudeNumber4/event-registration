@@ -1,6 +1,7 @@
 ﻿@page "/sessions/{SessionId}"
 @using EventRegistration.Services
 @using EventModels
+@using EventRegistration.ViewModels
 @inject SessionService SessionService
 @inject NavigationManager NavigationManager
 
@@ -27,7 +28,7 @@ else
         <InputText id="description" @bind-Value="@session.Description" class="col-sm-4" />
       </div>
       <div class="row">
-        <label for="dayselect" class="col-sm-4">Day2</label>
+        <label for="dayselect" class="col-sm-4">Day</label>
         <DaySelect Session="session" />
       </div>
     </div>
@@ -39,20 +40,22 @@ else
 }
 
 @code {
-  private Session session = null; // must get from service
+    private EditSessionViewModel model;
 
-  [Parameter] // means it's passed on URL.
-  public string SessionId { get; set; }
+    private Session session = null;
 
-  protected override async Task OnInitializedAsync()
-  {
-    //Debug.Print(nameof(OnInitializedAsync));
-    session = await SessionService.GetSession(SessionId) ?? new Session { Title = "New Session" };
-  }
+    [Parameter] // means it's passed on URL.
+    public string SessionId { get; set; }
 
-  private async Task HandleValidSubmit()
-  {
-    await SessionService.EditSession(session);
-    NavigationManager.NavigateTo("sessions", true); // true: force refresh
-  }
+    protected override async Task OnInitializedAsync()
+    {
+        model = await EditSessionViewModel.CreateAsync(SessionService, SessionId);
+        session = model.Session;
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        await model.Submit();
+        NavigationManager.NavigateTo("sessions", true); // true: force refresh
+    }
 }
