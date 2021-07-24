@@ -144,6 +144,20 @@ namespace UnitTests
             var result = await _eventRepository.GetRegistrant(registrant.PersonalInfo.Email);
             Assert.AreEqual(registrant, result);
         }
+        
+        [TestMethod]
+        public async Task GetRegistrationByRegistrantId()
+        {
+            var registrantId1 = await _eventRepository.AddRecord(RecordTypes.Registrant, GetNew(RecordTypes.Registrant));
+            var registrantId2 = await _eventRepository.AddRecord(RecordTypes.Registrant, GetNew(RecordTypes.Registrant));
+            var registration1 = new Registration { RegistrantId = registrantId1 };
+            var registration2 = new Registration { RegistrantId = registrantId2, SessionIds = new List<int> { 42 } };
+            await _eventRepository.AddRecord(RecordTypes.Registration, registration1);
+            await _eventRepository.AddRecord(RecordTypes.Registration, registration2);
+            var result = await _eventRepository.GetRegistrationBy(registrantId2);
+            Assert.IsTrue(result.SessionIds.Any());
+            Assert.AreEqual(42, result.SessionIds.First());
+        }
 
         [TestMethod]
         public async Task RegistrationShouldBeValidWithoutSessionList()
@@ -198,7 +212,7 @@ namespace UnitTests
 
         private static Session GetNewSession() => new() { Day = DayOfWeek.Friday, Title = "title", Description = "description" };
 
-        private static Registration GetNewRegistration() => new() { Id = FIRST_RECORD_ID, RegistrationId = FIRST_RECORD_ID, SessionIds = new List<int> { FIRST_RECORD_ID } };
+        private static Registration GetNewRegistration() => new() { Id = FIRST_RECORD_ID, RegistrantId = FIRST_RECORD_ID, SessionIds = new List<int> { FIRST_RECORD_ID } };
 
         void ValidateSession(Session session)
         {
@@ -212,7 +226,7 @@ namespace UnitTests
         {
             Assert.IsNotNull(r);
             Assert.IsTrue(r.Id > 0);
-            Assert.IsTrue(r.RegistrationId > 0);
+            Assert.IsTrue(r.RegistrantId > 0);
             Assert.IsNotNull(r.SessionIds);
         }
 

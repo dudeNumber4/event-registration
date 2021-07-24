@@ -8,7 +8,13 @@ namespace EventRegistration.Services
 {
     public class RegistrationService : ServiceBase
     {
-        public async Task<bool> RegistrationExists(int registrantId)
-            => await _eventRepository.GetRegistration(registrantId) != null;
+        public async Task<Registration> GetRegistration(int id)
+            => await _eventRepository.GetRegistration(id);
+
+        public async Task<Registration> CreateRegistration(int registrantId)
+        {
+            var result = new Registration { RegistrantId = registrantId };
+            return result with { Id = await _eventRepository.AddRecord(EventRepository.RecordTypes.Registration, result) };
+        }
     }
 }

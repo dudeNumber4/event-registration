@@ -74,14 +74,15 @@ namespace EventRepository
         /// <param name="rt"></param>
         public async Task<List<string>> GetRecord(string id, RecordTypes rt) => await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id, RecordTypeConverter.GetFileName(rt))));
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="id"></param>
         public async Task<Registration> GetRegistration(int id)
         {
             var record = await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id.ToString(), RecordTypeConverter.GetFileName(RecordTypes.Registration))));
             return new Registration().FromBasicRecord(record) as Registration;
+        }
+        public async Task<Registration> GetRegistrationBy(int registrantId)
+        {
+            var registrations = await GetAllRegistrations();  // not built for speed
+            return registrations.FirstOrDefault(r => r.RegistrantId == registrantId);
         }
 
         public async Task<Registrant> GetRegistrant(int id)

@@ -10,13 +10,10 @@ module RecordTypes =
   type RegistrantRecord = (string * string * string * string * string * string)
   let registrantFileName = "Registrant.csv"
 
-  // id, registrationId, unbounded SessionIds
+  // id, registrantId, unbounded SessionIds
   type RegistrationRecord = (string * string * string List)
   let registrationFileName = "Registration.csv"
 
-// Registrant (personal info)
-// Registration -> Registrant + (sessions)
-  
   type EventRegistrationRecord =
     | RegistrantRecord of RegistrantRecord
     | SessionRecord of SessionRecord

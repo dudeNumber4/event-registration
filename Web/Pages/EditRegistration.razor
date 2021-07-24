@@ -1,21 +1,33 @@
 ﻿@page "/edit-registration/{RegistrationId}"
 @using EventRegistration.ViewModels
-@*SelectSessions & SelectedSessions components *@
+@using EventRegistration.Services
+@inject RegistrationService RegistrationService
 
 <h3>Edit Registration</h3>
-<div>@model?.RegistrantId</div>
+<div>SHOW REGISTRANT'S name HERE</div>
+
+<div class="container">
+  <div class="row">
+    <div class="col">
+      <SelectSessions />
+    </div>
+    <div class="col">
+      <SelectedSessions />
+    </div>
+  </div>
+</div>
 
 @code {
-    private EditRegistrationViewModel model;
+  private EditRegistrationViewModel model;
 
-    [Parameter]
-    public string RegistrationId { get; set; }
+  [Parameter]
+  public string RegistrationId { get; set; }
 
-    protected override void OnInitialized()
+  protected override void OnInitialized()
+  {
+    if (int.TryParse(RegistrationId, out var id))
     {
-        if (int.TryParse(RegistrationId, out var id))
-        {
-            model = new(id);
-        }
+      model = new(RegistrationService, id);
     }
+  }
 }

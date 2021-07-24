@@ -10,11 +10,6 @@ namespace EventRegistration.Services
     {
 
         /// <summary>
-        /// Set upon login.
-        /// </summary>
-        public Registrant CurrentRegistrant { get; set; }
-
-        /// <summary>
         /// 
         /// </summary>
         /// <param name="id"></param>

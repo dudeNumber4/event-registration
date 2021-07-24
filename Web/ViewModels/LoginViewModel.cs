@@ -1,28 +1,24 @@
-﻿using EventModels;
+﻿using System;
+using EventModels;
 using EventRegistration.Services;
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
 namespace EventRegistration.ViewModels
 {
     
-    public class LoginViewModel
+    public class LoginViewModel: ViewModelBase
     {
         
         private RegistrantService _registrantService;
-        private RegistrationService _registrationService;
 
         [Required]
         public string Email { get; set; }
         public string ValidationMsg { get; set; }
         public Registrant Registrant { get; set; }
 
-        public LoginViewModel(RegistrantService registrantService, RegistrationService registrationService)
-        {
+        public LoginViewModel(RegistrantService registrantService, RegistrationService registrationService): base(registrationService) =>
             _registrantService = registrantService;
-            _registrationService = registrationService;
-        }
 
         public async Task<bool> RegistrantExists()
         {
@@ -35,7 +31,11 @@ namespace EventRegistration.ViewModels
             if (Registrant == null)
                 return false;
             else
-                return await _registrationService.RegistrationExists(Registrant.Id);
+            {
+                // WRONG!!  get registration by registrant id.
+                Registration = await _registrationService.GetRegistration(Registrant.Id);
+                return Registration != null;
+            }
         }
 
     }

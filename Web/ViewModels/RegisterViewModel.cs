@@ -1,20 +1,22 @@
 ﻿using EventModels;
 using EventRegistration.Services;
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace EventRegistration.ViewModels
 {
    
-    public class RegisterViewModel
+    public class RegisterViewModel: ViewModelBase
     {
 
         private RegistrantService _registrantService;
         public string ValidationMsg { get; set; }
         public Registrant Registrant { get; set; } = new();
 
-        public RegisterViewModel(RegistrantService registrantService) => _registrantService = registrantService;
+        public RegisterViewModel(RegistrantService registrantService, RegistrationService registrationService) : base(registrationService) =>
+            _registrantService = registrantService;
 
         public async Task<bool> Register()
         {
@@ -35,4 +37,5 @@ namespace EventRegistration.ViewModels
         }
 
     }
+
 }

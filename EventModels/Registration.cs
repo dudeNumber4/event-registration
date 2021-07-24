@@ -10,10 +10,10 @@ namespace EventModels
     {
 
         public int Id { get; set; }
-        public int RegistrationId { get; set; }
+        public int RegistrantId { get; set; }
 
         /// <summary>
-        /// I don't know wtf this is for now.
+        /// Now I don't know wtf this is for.
         /// </summary>
         public SessionList SessionList { get; set; } = new SessionList(new List<Session>());
 
@@ -25,12 +25,12 @@ namespace EventModels
         public IEventRecord FromBasicRecord(IEnumerable<string> record)
         {
             var recordList = record.ToList();
-            if ((recordList?.Count >= 2) && int.TryParse(recordList[0], out var id) && int.TryParse(recordList[1], out var registrationId))
+            if ((recordList?.Count >= 2) && int.TryParse(recordList[0], out var id) && int.TryParse(recordList[1], out var registrantId))
             {
                 var result = new Registration
                 {
                     Id = id,
-                    RegistrationId = registrationId,
+                    RegistrantId = registrantId,
                     SessionIds = record.TakeLast(recordList.Count - 2).Select(i =>
                     {
                         int.TryParse(i, out var convertedId);
@@ -47,10 +47,13 @@ namespace EventModels
 
         public IEnumerable<string> ToBasicRecord()
         {
-            yield return RegistrationId.ToString();
-            foreach (var id in SessionIds)
+            yield return RegistrantId.ToString();
+            if ((SessionIds != null) && SessionIds.Any())
             {
-                yield return id.ToString();
+                foreach (var id in SessionIds)
+                {
+                    yield return id.ToString();
+                }
             }
         }
 
