@@ -23,8 +23,13 @@ namespace EventRegistration.ViewModels
 
         public string RegistrantName()
         {
-            var registrant = _registrantService.GetRegistrant(_registrationId);
-            return registrant?.ToName();
+            if (Registration is null)
+                return string.Empty;
+            else
+            {
+                var registrant = _registrantService.GetRegistrant(Registration.RegistrantId.ToString());
+                return registrant?.ToName();
+            }
         }
 
         private EditRegistrationViewModel(RegistrationService registrationService, RegistrantService registrantService, string registrationId) :base(registrationService)
