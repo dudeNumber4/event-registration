@@ -17,11 +17,7 @@ namespace EventRegistration.ViewModels
 
         public ViewModelBase(RegistrationService registrationService) => _registrationService = registrationService;
 
-        public async Task<Registration> CreateRegistration(int registrationId)
-        {
-            Registration = await _registrationService.CreateRegistration(registrationId);
-            return Registration;
-        }
+        public Registration CreateRegistration(int registrationId) => _registrationService.CreateRegistration(registrationId);
 
     }
 }

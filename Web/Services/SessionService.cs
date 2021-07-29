@@ -15,48 +15,35 @@ namespace EventRegistration.Services
     public class SessionService: ServiceBase
     {
 
-        public async Task<List<Session>> GetAllSessions(bool createNew = true)
+        public List<Session> GetAllSessions(bool createNew = true)
         {
-            var sessions = await _eventRepository.GetAllSessions().ConfigureAwait(false);
+            var sessions = _eventRepository.GetAllSessions();
             if ((sessions.Count == 0) && createNew)
             {
-                sessions = await _eventRepository.GetAllSessions().ConfigureAwait(false);
+                sessions = _eventRepository.GetAllSessions();
             }
             return sessions;
         }
 
-        public async Task EditSession(Session s)
-        {
-            await _eventRepository.UpdateRecord(s, RecordTypes.Session).ConfigureAwait(false);
-        }
+        public void EditSession(Session s) => _eventRepository.UpdateRecord(s, RecordTypes.Session);
 
-        public async Task<int> AddSession(Session s) => await _eventRepository.AddRecord(RecordTypes.Session, s);
-        public async Task UpdateSession(Session s) => await _eventRepository.UpdateRecord(s, RecordTypes.Session);
+        public int AddSession(Session s) => _eventRepository.AddRecord(RecordTypes.Session, s);
+        public void UpdateSession(Session s) => _eventRepository.UpdateRecord(s, RecordTypes.Session);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<Session> GetSession(string id)
-        {
-            var session = await _eventRepository.GetSession(int.Parse(id)).ConfigureAwait(false);
-            return session;
-        }
+        public Session GetSession(string id) => _eventRepository.GetSession(int.Parse(id));
 
         /// <summary>
         /// temp
         /// </summary>
         /// <returns></returns>
-        public async Task DeleteAllSessions()
-        {
-            await _eventRepository.DeleteFile(RecordTypes.Session).ConfigureAwait(false);
-        }
+        public void DeleteAllSessions() => _eventRepository.DeleteFile(RecordTypes.Session);
 
-        public async Task DeleteSession(int id)
-        {
-            await _eventRepository.DeleteRecord(id.ToString(), RecordTypes.Session).ConfigureAwait(false);
-        }
+        public void DeleteSession(int id) => _eventRepository.DeleteRecord(id.ToString(), RecordTypes.Session);
 
     }
 

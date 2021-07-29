@@ -46,9 +46,9 @@
 @code {
   private RegisterViewModel model;
 
-  async void RegisterYo()
+  void RegisterYo()
   {
-    if (await model.Register())
+    if (model.Register())
     {
       var registration = model.CreateRegistration(model.Registrant.Id);
       NavigationManager.NavigateTo($"edit-registration/{registration.Id}");

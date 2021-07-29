@@ -47,15 +47,15 @@ else
     List<Session> sessions;
     //int editSessionId = 0;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-      await LoadSessions(true).ConfigureAwait(false);
+      LoadSessions(true);
     }
 
-    async Task DeleteAll(MouseEventArgs e)
+    void DeleteAll(MouseEventArgs e)
     {
-      await SessionService.DeleteAllSessions().ConfigureAwait(false);
-      await LoadSessions(false).ConfigureAwait(false);
+      SessionService.DeleteAllSessions();
+      LoadSessions(false);
     }
 
     void EditSession(int sessionId)
@@ -63,17 +63,17 @@ else
       NavigationManager.NavigateTo($"sessions/{sessionId}");
     }
 
-    async Task DeleteSession(MouseEventArgs e, int id)
+    void DeleteSession(MouseEventArgs e, int id)
     {
-      await SessionService.DeleteSession(id).ConfigureAwait(false);
+      SessionService.DeleteSession(id);
       // Each time I call this, the UI updates diff (implicit binding without declaring anything).
       // This happens for free with data held in DI services.
-      await LoadSessions(false).ConfigureAwait(false);
+      LoadSessions(false);
     }
 
-    async Task LoadSessions(bool createNew = true)
+    void LoadSessions(bool createNew = true)
     {
-      sessions = await SessionService.GetAllSessions(createNew).ConfigureAwait(false);
+      sessions = SessionService.GetAllSessions(createNew);
     }
 
     void Add(MouseEventArgs args)

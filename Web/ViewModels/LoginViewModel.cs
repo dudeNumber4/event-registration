@@ -21,30 +21,30 @@ namespace EventRegistration.ViewModels
         public LoginViewModel(RegistrantService registrantService, RegistrationService registrationService): base(registrationService) =>
             _registrantService = registrantService;
 
-        public async Task<bool> RegistrantExists()
+        public bool RegistrantExists()
         {
-            Registrant = await _registrantService.GetRegistrantByEmail(Email);
+            Registrant = _registrantService.GetRegistrantByEmail(Email);
             return Registrant != null;
         }
 
-        public async Task<bool> RegistrationExists()
+        public bool RegistrationExists()
         {
             if (Registrant == null)
                 return false;
             else
             {
-                Registration = await _registrationService.GetRegistrationBy(Registrant.Id);
+                Registration = _registrationService.GetRegistrationBy(Registrant.Id);
                 return Registration != null;
             }
         }
 
-        public async Task<bool> SessionsExist()
+        public bool SessionsExist()
         {
             if (Registrant == null)
                 return false;
             else
             {
-                Registration = await _registrationService.GetRegistrationBy(Registrant.Id);
+                Registration = _registrationService.GetRegistrationBy(Registrant.Id);
                 return Registration.SessionIds.Any();
             }
         }

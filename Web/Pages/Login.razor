@@ -30,13 +30,13 @@
     private LoginViewModel model;
     //private EditContext editContext;
 
-    async void LoginYo()
+    void LoginYo()
     {
-      if (await model.RegistrantExists())
+      if (model.RegistrantExists())
       {
-        if (!await model.RegistrationExists())
-          await model.CreateRegistration(model.Registrant.Id);
-        if (await model.SessionsExist())
+        if (!model.RegistrationExists())
+          model.CreateRegistration(model.Registrant.Id);
+        if (model.SessionsExist())
           NavigationManager.NavigateTo($"itinerary/{model.Registration.Id}");
         else
           NavigationManager.NavigateTo($"edit-registration/{model.Registration.Id}");

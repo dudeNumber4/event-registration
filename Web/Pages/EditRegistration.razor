@@ -24,9 +24,9 @@
     [Parameter]
     public string RegistrationId { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-      model = await EditRegistrationViewModel.CreateAsync(RegistrationService, RegistrantService, RegistrationId);
-      registrantName = await model.RegistrantName();
+      model = EditRegistrationViewModel.CreateAsync(RegistrationService, RegistrantService, RegistrationId);
+      registrantName = model.RegistrantName();
     }
 }

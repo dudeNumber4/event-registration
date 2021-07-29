@@ -47,15 +47,15 @@ else
     [Parameter] // means it's passed on URL.
     public string SessionId { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        model = await EditSessionViewModel.CreateAsync(SessionService, SessionId);
+        model = EditSessionViewModel.CreateAsync(SessionService, SessionId);
         session = model.Session;
     }
 
-    private async Task HandleValidSubmit()
+    private void HandleValidSubmit()
     {
-        await model.Submit();
+        model.Submit();
         NavigationManager.NavigateTo("sessions", true); // true: force refresh
     }
 }

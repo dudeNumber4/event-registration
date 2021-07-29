@@ -22,7 +22,7 @@ namespace EventRepository
             dataPreparer.Prepare();
         }
 
-        public async Task UpdateRecord(IEventRecord eventRecord, RecordTypes rt)
+        public void UpdateRecord(IEventRecord eventRecord, RecordTypes rt)
         {
             if (eventRecord == null)
             {
@@ -31,7 +31,7 @@ namespace EventRepository
             else
             {
                 int id = eventRecord.Id;
-                var existing = await GetRecord(id.ToString(), rt);
+                var existing = GetRecord(id.ToString(), rt);
                 if (existing.Any())
                     DataUtils.UpdateRecord(RecordTypeConverter.GetFileName(rt), GetFSharpList(eventRecord.ToFullRecord()));
                 else
@@ -46,63 +46,60 @@ namespace EventRepository
         /// </summary>
         /// <param name="rt"></param>
         /// <param name="recordContents">Fields for the record.</param>
-        public async Task<int> AddRecord(RecordTypes rt, IEventRecord record)
+        public int AddRecord(RecordTypes rt, IEventRecord record)
         {
-            return await Task.Run(() =>
-            {
-                FSharpList<string> recordValues = GetFSharpList(record.ToBasicRecord());
-                var result = DataUtils.AddRecord(RecordTypeConverter.GetFileName(rt), recordValues);
-                Debug.Print($"result: {result}");
-                return result;
-            });
+            FSharpList<string> recordValues = GetFSharpList(record.ToBasicRecord());
+            var result = DataUtils.AddRecord(RecordTypeConverter.GetFileName(rt), recordValues);
+            Debug.Print($"result: {result}");
+            return result;
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="rt"></param>
-        public async Task DeleteFile(RecordTypes rt) => await Task.Run(() => DataDriver.DeleteFile(RecordTypeConverter.GetFileName(rt)));
+        public void DeleteFile(RecordTypes rt) => DataDriver.DeleteFile(RecordTypeConverter.GetFileName(rt));
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="id"></param>
         /// <param name="rt"></param>
-        public async Task DeleteRecord(string id, RecordTypes rt) => await Task.Run(() => DataUtils.DeleteRecord(id, RecordTypeConverter.GetFileName(rt)));
+        public void DeleteRecord(string id, RecordTypes rt) => DataUtils.DeleteRecord(id, RecordTypeConverter.GetFileName(rt));
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="id"></param>
         /// <param name="rt"></param>
-        public async Task<List<string>> GetRecord(string id, RecordTypes rt) => await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id, RecordTypeConverter.GetFileName(rt))));
+        public List<string> GetRecord(string id, RecordTypes rt) => GetCSharpList(DataUtils.GetRecord(id, RecordTypeConverter.GetFileName(rt)));
 
-        public async Task<Registration> GetRegistration(int id)
+        public Registration GetRegistration(int id)
         {
-            var record = await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id.ToString(), RecordTypeConverter.GetFileName(RecordTypes.Registration))));
+            var record = GetCSharpList(DataUtils.GetRecord(id.ToString(), RecordTypeConverter.GetFileName(RecordTypes.Registration)));
             return new Registration().FromBasicRecord(record) as Registration;
         }
-        public async Task<Registration> GetRegistrationBy(int registrantId)
+        public Registration GetRegistrationBy(int registrantId)
         {
-            var registrations = await GetAllRegistrations();  // not built for speed
+            var registrations = GetAllRegistrations();  // not built for speed
             return registrations.FirstOrDefault(r => r.RegistrantId == registrantId);
         }
 
-        public async Task<Registrant> GetRegistrant(int id)
+        public Registrant GetRegistrant(int id)
         {
-            var record = await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id.ToString(), RecordTypeConverter.GetFileName(RecordTypes.Registrant))));
+            var record = GetCSharpList(DataUtils.GetRecord(id.ToString(), RecordTypeConverter.GetFileName(RecordTypes.Registrant)));
             return new Registrant().FromBasicRecord(record) as Registrant;
         }
 
-        public async Task<Registrant> GetRegistrant(string email)
+        public Registrant GetRegistrant(string email)
         {
-            var registrants = await GetAllRegistrants();
+            var registrants = GetAllRegistrants();
             return registrants.FirstOrDefault(r => r?.PersonalInfo?.Email == email);
         }
 
-        public async Task<Session> GetSession(int id)
+        public Session GetSession(int id)
         {
-            var record = await Task.FromResult(GetCSharpList(DataUtils.GetRecord(id.ToString(), RecordTypeConverter.GetFileName(RecordTypes.Session))));
+            var record = GetCSharpList(DataUtils.GetRecord(id.ToString(), RecordTypeConverter.GetFileName(RecordTypes.Session)));
             return new Session().FromBasicRecord(record) as Session;
         }
 
@@ -110,21 +107,21 @@ namespace EventRepository
         /// Apparently I wasn't thinking of performance here.
         /// </summary>
         /// <returns></returns>
-        public async Task<List<Session>> GetAllSessions()
+        public List<Session> GetAllSessions()
         {
-            FSharpList<FSharpList<string>> dataSessions = await Task.FromResult(DataUtils.GetAllSessions());
+            FSharpList<FSharpList<string>> dataSessions = DataUtils.GetAllSessions();
             return GetCSharpList(dataSessions).Select(s => new Session().FromBasicRecord(s) as Session).ToList();
         }
         
-        public async Task<List<Registrant>> GetAllRegistrants()
+        public List<Registrant> GetAllRegistrants()
         {
-            FSharpList<FSharpList<string>> registrants = await Task.FromResult(DataUtils.GetAllRegistrants());
+            FSharpList<FSharpList<string>> registrants = DataUtils.GetAllRegistrants();
             return GetCSharpList(registrants).Select(r => new Registrant().FromBasicRecord(r) as Registrant).ToList();
         }
 
-        public async Task<List<Registration>> GetAllRegistrations()
+        public List<Registration> GetAllRegistrations()
         {
-            FSharpList<FSharpList<string>> registrations = await Task.FromResult(DataUtils.GetAllRegistrations());
+            FSharpList<FSharpList<string>> registrations = DataUtils.GetAllRegistrations();
             return GetCSharpList(registrations).Select(r => new Registration().FromBasicRecord(r) as Registration).ToList();
         }
 

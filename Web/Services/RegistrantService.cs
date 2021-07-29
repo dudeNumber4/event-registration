@@ -14,14 +14,14 @@ namespace EventRegistration.Services
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<Registrant> GetRegistrant(string id) => await _eventRepository.GetRegistrant(int.Parse(id));
+        public Registrant GetRegistrant(string id) => _eventRepository.GetRegistrant(int.Parse(id));
         
-        public async Task<Registrant> GetRegistrantByEmail(string email) => await _eventRepository.GetRegistrant(email);
+        public Registrant GetRegistrantByEmail(string email) => _eventRepository.GetRegistrant(email);
 
-        public async Task<int> AddRegistrant(Registrant r) => await _eventRepository.AddRecord(EventRepository.RecordTypes.Registrant, r);
+        public int AddRegistrant(Registrant r) => _eventRepository.AddRecord(EventRepository.RecordTypes.Registrant, r);
 
-        public async Task<bool> RegistrantExists(Registrant r)
-            => await GetRegistrantByEmail(r?.PersonalInfo?.Email) != null;
+        public bool RegistrantExists(Registrant r)
+            => GetRegistrantByEmail(r?.PersonalInfo?.Email) != null;
 
     }
 

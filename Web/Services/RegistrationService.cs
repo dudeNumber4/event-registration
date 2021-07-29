@@ -8,16 +8,14 @@ namespace EventRegistration.Services
 {
     public class RegistrationService : ServiceBase
     {
-        public async Task<Registration> GetRegistrationBy(int registrantId)
-            => await _eventRepository.GetRegistrationBy(registrantId);
+        public Registration GetRegistrationBy(int registrantId) => _eventRepository.GetRegistrationBy(registrantId);
         
-        public async Task<Registration> GetRegistration(int id)
-            => await _eventRepository.GetRegistration(id);
+        public Registration GetRegistration(int id) => _eventRepository.GetRegistration(id);
 
-        public async Task<Registration> CreateRegistration(int registrantId)
+        public Registration CreateRegistration(int registrantId)
         {
             var result = new Registration { RegistrantId = registrantId };
-            return result with { Id = await _eventRepository.AddRecord(EventRepository.RecordTypes.Registration, result) };
+            return result with { Id = _eventRepository.AddRecord(EventRepository.RecordTypes.Registration, result) };
         }
     }
 }

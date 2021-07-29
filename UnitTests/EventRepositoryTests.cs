@@ -25,11 +25,11 @@ namespace UnitTests
         public static void ClassInit(TestContext tc) => _eventRepository = new EventRepo(new TempDataPreparer());
 
         [TestMethod]
-        public async Task GetAllSessions()
+        public void GetAllSessions()
         {
-            Task.WaitAll(new Task[] { _eventRepository.AddRecord(RecordTypes.Session, GetNew(RecordTypes.Session)) });
-            Task.WaitAll(new Task[] { _eventRepository.AddRecord(RecordTypes.Session, GetNew(RecordTypes.Session)) });
-            List<Session> result = await _eventRepository.GetAllSessions();
+            _eventRepository.AddRecord(RecordTypes.Session, GetNew(RecordTypes.Session));
+            _eventRepository.AddRecord(RecordTypes.Session, GetNew(RecordTypes.Session));
+            List<Session> result = _eventRepository.GetAllSessions();
             Assert.IsTrue(result.Count >= 2);
             ValidateEventRecord(result[result.Count - 2], RecordTypes.Session);
             ValidateEventRecord(result[result.Count - 1], RecordTypes.Session);
@@ -40,7 +40,7 @@ namespace UnitTests
         [DataRow(RecordTypes.Registrant)]
         [DataRow(RecordTypes.Session)]
         [DataRow(RecordTypes.Registration)]
-        public async Task AddConcreteTypes(RecordTypes rt)
+        public void AddConcreteTypes(RecordTypes rt)
         {
             IEventRecord eventObject = rt switch
             {
@@ -52,14 +52,14 @@ namespace UnitTests
 
             int newId = rt switch
             {
-                RecordTypes.Registration => await _eventRepository.AddRecord(RecordTypes.Registration, eventObject),
-                RecordTypes.Registrant => await _eventRepository.AddRecord(RecordTypes.Registrant, eventObject),
-                RecordTypes.Session => await _eventRepository.AddRecord(RecordTypes.Session, eventObject),
+                RecordTypes.Registration => _eventRepository.AddRecord(RecordTypes.Registration, eventObject),
+                RecordTypes.Registrant => _eventRepository.AddRecord(RecordTypes.Registrant, eventObject),
+                RecordTypes.Session => _eventRepository.AddRecord(RecordTypes.Session, eventObject),
                 _ => 0
             };
 
             // retrieve it; ensure it was saved correctly
-            var eventRecord = await GetEventRecord(rt, newId);
+            var eventRecord = GetEventRecord(rt, newId);
             ValidateEventRecord(eventRecord, rt);
         }
 
@@ -67,50 +67,50 @@ namespace UnitTests
         [DataRow(RecordTypes.Registrant)]
         [DataRow(RecordTypes.Session)]
         [DataRow(RecordTypes.Registration)]
-        public async Task ProcessRecord(RecordTypes rt)
+        public void ProcessRecord(RecordTypes rt)
         {
             // add 2 records of the given type
-            await _eventRepository.AddRecord(rt, GetNew(rt));
-            await _eventRepository.AddRecord(rt, GetNew(rt));
+            _eventRepository.AddRecord(rt, GetNew(rt));
+            _eventRepository.AddRecord(rt, GetNew(rt));
 
             // retrieve by id (should have fresh ids)
-            var eventRecord = await GetEventRecord(rt);
+            var eventRecord = GetEventRecord(rt);
             Assert.IsNotNull(eventRecord);
             Assert.AreEqual(FIRST_RECORD_ID, eventRecord.Id);
             ValidateEventRecord(eventRecord, rt);
 
             // delete
-            await _eventRepository.DeleteRecord(FIRST_RECORD_ID.ToString(), rt);
+            _eventRepository.DeleteRecord(FIRST_RECORD_ID.ToString(), rt);
 
             // retrieve nothing
-            eventRecord = await GetEventRecord(rt);
+            eventRecord = GetEventRecord(rt);
             Assert.IsNull(eventRecord);
         }
 
         [TestMethod]
-        public async Task DeleteSession()
+        public void DeleteSession()
         {
-            await _eventRepository.AddRecord(RecordTypes.Session, GetNew(RecordTypes.Session));
-            await _eventRepository.AddRecord(RecordTypes.Session, GetNew(RecordTypes.Session));
-            List<Session> result = await _eventRepository.GetAllSessions();
+            _eventRepository.AddRecord(RecordTypes.Session, GetNew(RecordTypes.Session));
+            _eventRepository.AddRecord(RecordTypes.Session, GetNew(RecordTypes.Session));
+            List<Session> result = _eventRepository.GetAllSessions();
             var sessionCount = result.Count;
             Assert.IsTrue(sessionCount >= 2);
             // delete one and refresh.
-            await _eventRepository.DeleteRecord(result[0].Id.ToString(), RecordTypes.Session);
-            result = await _eventRepository.GetAllSessions();
+            _eventRepository.DeleteRecord(result[0].Id.ToString(), RecordTypes.Session);
+            result = _eventRepository.GetAllSessions();
             Assert.IsTrue(result.Count == (sessionCount - 1));
         }
 
         [TestMethod]
-        public async Task UpdateSession()
+        public void UpdateSession()
         {
             const DayOfWeek testDay = DayOfWeek.Monday;
             const string testTitle = nameof(testTitle);
             const string testDesc = nameof(testDesc);
             // Add 2 sessions
-            await _eventRepository.AddRecord(RecordTypes.Session, GetNew(RecordTypes.Session));
-            await _eventRepository.AddRecord(RecordTypes.Session, GetNew(RecordTypes.Session));
-            List<Session> result = await _eventRepository.GetAllSessions();
+            _eventRepository.AddRecord(RecordTypes.Session, GetNew(RecordTypes.Session));
+            _eventRepository.AddRecord(RecordTypes.Session, GetNew(RecordTypes.Session));
+            List<Session> result = _eventRepository.GetAllSessions();
             Assert.IsTrue(result.Count >= 2);
             // edit; refresh.
             Session session = result[result.Count - 1];
@@ -118,8 +118,8 @@ namespace UnitTests
             session.Day = testDay;
             session.Description = testDesc;
             session.Title = testTitle;
-            await _eventRepository.UpdateRecord(session, RecordTypes.Session);
-            result = await _eventRepository.GetAllSessions();
+            _eventRepository.UpdateRecord(session, RecordTypes.Session);
+            result = _eventRepository.GetAllSessions();
             Assert.IsTrue(result.Count >= 2);
             session = result.FirstOrDefault(s => s.Title == testTitle);
             Assert.IsNotNull(session);
@@ -129,43 +129,43 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public async Task GetSessionsBeforeInitialized()
+        public void GetSessionsBeforeInitialized()
         {
-            await _eventRepository.DeleteFile(RecordTypes.Session);
-            List<Session> sessions = await _eventRepository.GetAllSessions(); // don't blow up.
+            _eventRepository.DeleteFile(RecordTypes.Session);
+            List<Session> sessions = _eventRepository.GetAllSessions(); // don't blow up.
             Assert.IsFalse(sessions.Any());
         }
 
         [TestMethod]
-        public async Task GetRegistrantByEmail()
+        public void GetRegistrantByEmail()
         {
-            var registrantId = await _eventRepository.AddRecord(RecordTypes.Registrant, GetNew(RecordTypes.Registrant));
-            var registrant = await _eventRepository.GetRegistrant(registrantId);
-            var result = await _eventRepository.GetRegistrant(registrant.PersonalInfo.Email);
+            var registrantId = _eventRepository.AddRecord(RecordTypes.Registrant, GetNew(RecordTypes.Registrant));
+            var registrant = _eventRepository.GetRegistrant(registrantId);
+            var result = _eventRepository.GetRegistrant(registrant.PersonalInfo.Email);
             Assert.AreEqual(registrant, result);
         }
         
         [TestMethod]
-        public async Task GetRegistrationByRegistrantId()
+        public void GetRegistrationByRegistrantId()
         {
-            var registrantId1 = await _eventRepository.AddRecord(RecordTypes.Registrant, GetNew(RecordTypes.Registrant));
-            var registrantId2 = await _eventRepository.AddRecord(RecordTypes.Registrant, GetNew(RecordTypes.Registrant));
+            var registrantId1 = _eventRepository.AddRecord(RecordTypes.Registrant, GetNew(RecordTypes.Registrant));
+            var registrantId2 = _eventRepository.AddRecord(RecordTypes.Registrant, GetNew(RecordTypes.Registrant));
             var registration1 = new Registration { RegistrantId = registrantId1 };
             var registration2 = new Registration { RegistrantId = registrantId2, SessionIds = new List<int> { 42 } };
-            await _eventRepository.AddRecord(RecordTypes.Registration, registration1);
-            await _eventRepository.AddRecord(RecordTypes.Registration, registration2);
-            var result = await _eventRepository.GetRegistrationBy(registrantId2);
+            _eventRepository.AddRecord(RecordTypes.Registration, registration1);
+            _eventRepository.AddRecord(RecordTypes.Registration, registration2);
+            var result = _eventRepository.GetRegistrationBy(registrantId2);
             Assert.IsTrue(result.SessionIds.Any());
             Assert.AreEqual(42, result.SessionIds.First());
         }
 
         [TestMethod]
-        public async Task RegistrationShouldBeValidWithoutSessionList()
+        public void RegistrationShouldBeValidWithoutSessionList()
         {
             Registration r = GetNewRegistration();
             r.SessionIds.Clear();
-            var registrationId = await _eventRepository.AddRecord(RecordTypes.Registration, r);
-            r = _eventRepository.GetRegistration(registrationId).Result;
+            var registrationId = _eventRepository.AddRecord(RecordTypes.Registration, r);
+            r = _eventRepository.GetRegistration(registrationId);
             Assert.AreEqual(r.SessionIds.Count, 0);
         }
 
@@ -188,11 +188,11 @@ namespace UnitTests
             }
         }
 
-        private async Task<IEventRecord> GetEventRecord(RecordTypes rt, int id = FIRST_RECORD_ID) => rt switch
+        private IEventRecord GetEventRecord(RecordTypes rt, int id = FIRST_RECORD_ID) => rt switch
         {
-            RecordTypes.Registration => await _eventRepository.GetRegistration(id),
-            RecordTypes.Registrant => await _eventRepository.GetRegistrant(id),
-            RecordTypes.Session => await _eventRepository.GetSession(id),
+            RecordTypes.Registration => _eventRepository.GetRegistration(id),
+            RecordTypes.Registrant => _eventRepository.GetRegistrant(id),
+            RecordTypes.Session => _eventRepository.GetSession(id),
             _ => null
         };
 

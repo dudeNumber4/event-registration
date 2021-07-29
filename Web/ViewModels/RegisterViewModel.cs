@@ -18,14 +18,14 @@ namespace EventRegistration.ViewModels
         public RegisterViewModel(RegistrantService registrantService, RegistrationService registrationService) : base(registrationService) =>
             _registrantService = registrantService;
 
-        public async Task<bool> Register()
+        public bool Register()
         {
             (bool valid, string reason) = Registrant.IsValid();
             if (valid)
             {
-                if (!(await _registrantService.RegistrantExists(Registrant)))
+                if (!(_registrantService.RegistrantExists(Registrant)))
                 {
-                    Registrant.Id = await _registrantService.AddRegistrant(Registrant);
+                    Registrant.Id = _registrantService.AddRegistrant(Registrant);
                     return true;
                 }
                 else

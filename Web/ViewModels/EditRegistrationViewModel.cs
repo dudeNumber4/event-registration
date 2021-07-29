@@ -13,17 +13,17 @@ namespace EventRegistration.ViewModels
         private RegistrantService _registrantService;
         private string _registrationId;
 
-        public static async Task<EditRegistrationViewModel> CreateAsync(RegistrationService registrationService, RegistrantService registrantService, string registrationId)
+        public static EditRegistrationViewModel CreateAsync(RegistrationService registrationService, RegistrantService registrantService, string registrationId)
         {
             EditRegistrationViewModel result = new(registrationService, registrantService, registrationId);
             if (int.TryParse(registrationId, out var s))
-                result.Registration = await registrationService.GetRegistration(s);
+                result.Registration = registrationService.GetRegistration(s);
             return result;
         }
 
-        public async Task<string> RegistrantName()
+        public string RegistrantName()
         {
-            var registrant = await _registrantService.GetRegistrant(_registrationId);
+            var registrant = _registrantService.GetRegistrant(_registrationId);
             return registrant?.ToName();
         }
 

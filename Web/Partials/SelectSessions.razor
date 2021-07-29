@@ -54,9 +54,9 @@ else
 
   private SessionList sessions = null;
 
-  protected override async Task OnInitializedAsync()
+  protected override void OnInitialized()
   {
-    var sessionList = await SessionService.GetAllSessions();
+    var sessionList = SessionService.GetAllSessions();
     // ToDo: get sessions that haven't been added to an existing registration.
     sessions = new SessionList(sessionList);
   }
