@@ -3,6 +3,7 @@ using EventModels;
 using EventRegistration.Services;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace EventRegistration.ViewModels
 {
@@ -32,9 +33,19 @@ namespace EventRegistration.ViewModels
                 return false;
             else
             {
-                // WRONG!!  get registration by registrant id.
-                Registration = await _registrationService.GetRegistration(Registrant.Id);
+                Registration = await _registrationService.GetRegistrationBy(Registrant.Id);
                 return Registration != null;
+            }
+        }
+
+        public async Task<bool> SessionsExist()
+        {
+            if (Registrant == null)
+                return false;
+            else
+            {
+                Registration = await _registrationService.GetRegistrationBy(Registrant.Id);
+                return Registration.SessionIds.Any();
             }
         }
 

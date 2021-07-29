@@ -8,6 +8,9 @@ namespace EventRegistration.Services
 {
     public class RegistrationService : ServiceBase
     {
+        public async Task<Registration> GetRegistrationBy(int registrantId)
+            => await _eventRepository.GetRegistrationBy(registrantId);
+        
         public async Task<Registration> GetRegistration(int id)
             => await _eventRepository.GetRegistration(id);
 

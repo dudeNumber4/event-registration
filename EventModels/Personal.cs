@@ -33,6 +33,9 @@ namespace EventModels
                 return null;
             }
         }
+
+        public string ToName() => $"{FirstName} {LastName}";
+
     }
 
 }

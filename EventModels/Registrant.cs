@@ -38,6 +38,8 @@ namespace EventModels
             }
         }
 
+        public string ToName() => PersonalInfo?.ToName();
+
         public IEnumerable<string> ToBasicRecord()
         {
             yield return PersonalInfo.FirstName;

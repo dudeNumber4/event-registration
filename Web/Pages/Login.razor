@@ -27,32 +27,29 @@
 </EditForm>
 
 @code {
-  private LoginViewModel model;
-  //private EditContext editContext;
+    private LoginViewModel model;
+    //private EditContext editContext;
 
-  async void LoginYo()
-  {
-    if (await model.RegistrantExists())
+    async void LoginYo()
     {
-      if (await model.RegistrationExists())
+      if (await model.RegistrantExists())
       {
-        NavigationManager.NavigateTo($"itinerary/{model.Registrant.Id}");
+        if (!await model.RegistrationExists())
+          await model.CreateRegistration(model.Registrant.Id);
+        if (await model.SessionsExist())
+          NavigationManager.NavigateTo($"itinerary/{model.Registration.Id}");
+        else
+          NavigationManager.NavigateTo($"edit-registration/{model.Registration.Id}");
       }
       else
       {
-        var registration = await model.CreateRegistration(model.Registrant.Id);
-        NavigationManager.NavigateTo($"edit-registration/{registration.Id}");
+        model.ValidationMsg = "Registrant not found.";
       }
     }
-    else
-    {
-      model.ValidationMsg = "Registrant not found.";
-    }
-  }
 
-  protected override void OnInitialized()
-  {
-    model = new(RegistrantService, RegistrationService);
-    //editContext = new(model);
-  }
+    protected override void OnInitialized()
+    {
+      model = new(RegistrantService, RegistrationService);
+      //editContext = new(model);
+    }
 }

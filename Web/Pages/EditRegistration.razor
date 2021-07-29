@@ -2,11 +2,11 @@
 @using EventRegistration.ViewModels
 @using EventRegistration.Services
 @inject RegistrationService RegistrationService
+@inject RegistrantService RegistrantService
 
-<h3>Edit Registration</h3>
-<div>SHOW REGISTRANT'S name HERE</div>
+<h3>Edit Registration for @registrantName</h3>
 
-<div class="container">
+<div class="container-fluid">
   <div class="row">
     <div class="col">
       <SelectSessions />
@@ -18,16 +18,15 @@
 </div>
 
 @code {
-  private EditRegistrationViewModel model;
+    private EditRegistrationViewModel model;
+    private string registrantName = string.Empty;
 
-  [Parameter]
-  public string RegistrationId { get; set; }
+    [Parameter]
+    public string RegistrationId { get; set; }
 
-  protected override void OnInitialized()
-  {
-    if (int.TryParse(RegistrationId, out var id))
+    protected override async Task OnInitializedAsync()
     {
-      model = new(RegistrationService, id);
+      model = await EditRegistrationViewModel.CreateAsync(RegistrationService, RegistrantService, RegistrationId);
+      registrantName = await model.RegistrantName();
     }
-  }
 }

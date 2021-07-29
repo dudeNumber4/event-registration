@@ -8,53 +8,62 @@
 }
 else
 {
-  <h3>Available Sessions</h3>
-  <table class="table">
-    <thead>
-      <tr>
-        <th></th>
-        <th>Day</th>
-        <th>Title</th>
-        <th>Description</th>
-        <th>Edit</th>
-      </tr>
-    </thead>
-    <tbody>
-      @foreach (var session in sessions)
-      {
-        <tr>
-          <td>@session.Day</td>
-          <td>@session.Title</td>
-          <td>@session.Description</td>
-          <td><button @onclick="AddSession" class="btn btn-primary">Add</button></td>
-        </tr>
-      }
-    </tbody>
-  </table>
-  <div>
-    <span><button class="btn btn-primary" @onclick="Confirm">Confirm Selected Sessions</button></span>
+  <h5>Available Sessions</h5>
+  <hr />
+
+  <div class="container">
+    <div class="row font-weight-bold">
+      <div class="col">
+        Day
+      </div>
+      <div class="col">
+        Title
+      </div>
+      <div class="col">
+        Description
+      </div>
+      <div class="col">
+        &nbsp;
+      </div>
+    </div>
   </div>
+
+  <div class="container">
+    @foreach (var session in sessions)
+    {
+      <div class="row mt-1">
+        <div class="col">
+          @session.Day
+        </div>
+        <div class="col">
+          @session.Title
+        </div>
+        <div class="col">
+          @session.Description
+        </div>
+        <div class="col">
+          <button @onclick="AddSession" class="btn btn-primary btn-sm">Add</button>
+        </div>
+      </div>
+    }
+  </div>
+
 }
 
 @code {
 
-    private SessionList sessions = null;
+  private SessionList sessions = null;
 
-    private async Task HandleValidSubmit()
-    {
-      var sessionList = await SessionService.GetAllSessions();
-      // ToDo: get sessions that haven't been added to an existing registration.
-      sessions = new SessionList(sessionList);
-    }
+  protected override async Task OnInitializedAsync()
+  {
+    var sessionList = await SessionService.GetAllSessions();
+    // ToDo: get sessions that haven't been added to an existing registration.
+    sessions = new SessionList(sessionList);
+  }
 
-    void Confirm(MouseEventArgs args)
-    {
+  void AddSession(MouseEventArgs args)
+  {
 
-    }
-    
-    void AddSession(MouseEventArgs args)
-    {
-      
-    }
+  }
 
 }

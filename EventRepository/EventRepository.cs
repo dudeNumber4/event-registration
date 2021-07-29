@@ -3,6 +3,7 @@ using EventModels;
 using Microsoft.FSharp.Collections;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -50,7 +51,9 @@ namespace EventRepository
             return await Task.Run(() =>
             {
                 FSharpList<string> recordValues = GetFSharpList(record.ToBasicRecord());
-                return DataUtils.AddRecord(RecordTypeConverter.GetFileName(rt), recordValues);
+                var result = DataUtils.AddRecord(RecordTypeConverter.GetFileName(rt), recordValues);
+                Debug.Print($"result: {result}");
+                return result;
             });
         }
 
@@ -94,7 +97,7 @@ namespace EventRepository
         public async Task<Registrant> GetRegistrant(string email)
         {
             var registrants = await GetAllRegistrants();
-            return registrants.FirstOrDefault(r => r.PersonalInfo.Email == email);
+            return registrants.FirstOrDefault(r => r?.PersonalInfo?.Email == email);
         }
 
         public async Task<Session> GetSession(int id)
