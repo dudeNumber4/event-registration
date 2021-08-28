@@ -28,7 +28,7 @@ namespace EventModels
         }
 
         /// <summary>
-        /// This was intended to be some kind of random session suggestion thing.  But randomly generated sessions... wouldn't be in the main repositori.
+        /// This was intended to be some kind of random session suggestion thing.  But randomly generated sessions... wouldn't be in the main repository.
         /// </summary>
         /// <returns></returns>
         public List<Session> GetSuggestedSessions()

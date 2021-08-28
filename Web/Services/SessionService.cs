@@ -15,15 +15,7 @@ namespace EventRegistration.Services
     public class SessionService: ServiceBase
     {
 
-        public List<Session> GetAllSessions(bool createNew = true)
-        {
-            var sessions = _eventRepository.GetAllSessions();
-            if ((sessions.Count == 0) && createNew)
-            {
-                sessions = _eventRepository.GetAllSessions();
-            }
-            return sessions;
-        }
+        public List<Session> GetAllSessions() => _eventRepository.GetAllSessions();
 
         public void EditSession(Session s) => _eventRepository.UpdateRecord(s, RecordTypes.Session);
 
@@ -44,6 +36,24 @@ namespace EventRegistration.Services
         public void DeleteAllSessions() => _eventRepository.DeleteFile(RecordTypes.Session);
 
         public void DeleteSession(int id) => _eventRepository.DeleteRecord(id.ToString(), RecordTypes.Session);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="registrationId"></param>
+        /// <param name="registrationService"></param>
+        /// <param name="registeredFor">If true, return sessions registered for, else sessions not registered for</param>
+        /// <returns></returns>
+        public SessionList PopulateSessions(string registrationId, RegistrationService registrationService, bool registeredFor)
+        {
+            if (int.TryParse(registrationId, out var id))
+            {
+                var registration = registrationService.GetRegistration(id);
+                var sessions = GetAllSessions();
+                return new SessionList(sessions?.Where(s => registeredFor ? registration.SessionIds.Contains(s.Id) : !registration.SessionIds.Contains(s.Id)).ToList());
+            }
+            return new SessionList(new());
+        }
 
     }
 

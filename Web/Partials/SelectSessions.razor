@@ -1,5 +1,7 @@
 ﻿@using EventRegistration.Services
+@using EventRegistration.ViewModels
 @using EventModels
+@inject RegistrationService RegistrationService
 @inject SessionService SessionService
 
 @if (sessions == null)
@@ -8,7 +10,7 @@
 }
 else
 {
-  <h5>Available Sessions</h5>
+  <h6>Available Sessions</h6>
   <hr />
 
   <div class="container">
@@ -53,12 +55,15 @@ else
 @code {
 
   private SessionList sessions = null;
+  private SelectSessionsViewModel model;
+
+  [CascadingParameter]
+  public string RegistrationId { get; set; }
 
   protected override void OnInitialized()
   {
-    var sessionList = SessionService.GetAllSessions();
-    // ToDo: get sessions that haven't been added to an existing registration.
-    sessions = new SessionList(sessionList);
+    model = new SelectSessionsViewModel(RegistrationService, SessionService);
+    sessions = model.PopulateSessions(RegistrationId);
   }
 
   void AddSession(MouseEventArgs args)

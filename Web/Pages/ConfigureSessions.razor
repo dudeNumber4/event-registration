@@ -19,7 +19,7 @@ else
         <th>Day</th>
         <th>Title</th>
         <th>Description</th>
-        <th>Edit</th>
+        <th></th>
       </tr>
     </thead>
     <tbody>
@@ -49,13 +49,13 @@ else
 
     protected override void OnInitialized()
     {
-      LoadSessions(true);
+      LoadSessions();
     }
 
     void DeleteAll(MouseEventArgs e)
     {
       SessionService.DeleteAllSessions();
-      LoadSessions(false);
+      LoadSessions();
     }
 
     void EditSession(int sessionId)
@@ -68,12 +68,12 @@ else
       SessionService.DeleteSession(id);
       // Each time I call this, the UI updates diff (implicit binding without declaring anything).
       // This happens for free with data held in DI services.
-      LoadSessions(false);
+      LoadSessions();
     }
 
-    void LoadSessions(bool createNew = true)
+    void LoadSessions()
     {
-      sessions = SessionService.GetAllSessions(createNew);
+      sessions = SessionService.GetAllSessions();
     }
 
     void Add(MouseEventArgs args)

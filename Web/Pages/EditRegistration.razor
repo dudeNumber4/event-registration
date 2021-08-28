@@ -9,10 +9,14 @@
 <div class="container-fluid">
   <div class="row">
     <div class="col">
-      <SelectSessions />
+      <CascadingValue Value="RegistrationId">
+        <SelectSessions />
+      </CascadingValue>
     </div>
     <div class="col">
-      <SelectedSessions />
+      <CascadingValue Value="RegistrationId">
+        <SelectedSessions />
+      </CascadingValue>
     </div>
   </div>
 </div>

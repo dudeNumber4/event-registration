@@ -1,5 +1,31 @@
-﻿<h6>SelectedSessions</h6>
+﻿@using EventRegistration.Services
+@using EventRegistration.ViewModels
+@using EventModels
+@inject RegistrationService RegistrationService
+@inject SessionService SessionService
+
+<h6>SelectedSessions</h6>
+<hr />
+<ul class="list-group">
+  @foreach (var session in sessions)
+  {
+    // class active highlights
+    <li class="list-group-item">@session.Title (@session.Day)</li>
+  }
+</ul>
 
 @code {
+
+    private SessionList sessions = null;
+    private SelectedSessionsViewModel model;
+
+    [CascadingParameter]
+    public string RegistrationId { get; set; }
+
+    protected override void OnInitialized()
+    {
+      model = new SelectedSessionsViewModel(RegistrationService, SessionService);
+      sessions = model.PopulateSessions(RegistrationId);
+    }
 
 }
