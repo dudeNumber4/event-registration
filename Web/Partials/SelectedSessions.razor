@@ -10,7 +10,18 @@
   @foreach (var session in sessions)
   {
     // class active highlights
-    <li class="list-group-item">@session.Title (@session.Day)</li>
+  <li class="list-group-item">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-11">
+          <span>@session.Title (@session.Day)</span>
+        </div>
+        <div class="col-1">
+          <button @onclick="@(() => OnRemove.InvokeAsync(session.Id))" class="btn btn-primary btn-sm">Remove</button>
+        </div>
+      </div>
+    </div>
+  </li>
   }
 </ul>
 
@@ -21,6 +32,14 @@
 
     [CascadingParameter]
     public string RegistrationId { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnRemove { get; set; }
+
+    public void Refresh()
+    {
+      sessions = model.PopulateSessions(RegistrationId);
+    }
 
     protected override void OnInitialized()
     {

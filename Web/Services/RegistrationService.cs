@@ -18,11 +18,19 @@ namespace EventRegistration.Services
             return result with { Id = _eventRepository.AddRecord(EventRepository.RecordTypes.Registration, result) };
         }
 
-        public void AddSession(int registrantId, int sessionId)
+        public void AddSession(int registrantId, int sessionId) => ChangeSessionList(registrantId, sessionId, true);
+
+        public void RemoveSession(int registrantId, int sessionId) => ChangeSessionList(registrantId, sessionId, false);
+
+        private void ChangeSessionList(int registrantId, int sessionId, bool add)
         {
             var registration = GetRegistrationBy(registrantId);
-            registration.SessionIds.Add(sessionId);
+            if (add)
+                registration.SessionIds.Add(sessionId);
+            else
+                registration.SessionIds.Remove(sessionId);
             _eventRepository.UpdateRecord(registration, EventRepository.RecordTypes.Registration);
         }
+
     }
 }

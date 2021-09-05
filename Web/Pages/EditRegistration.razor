@@ -14,7 +14,7 @@
     </div>
     <div class="col">
       <CascadingValue Value="RegistrationId">
-        <SelectedSessions />
+        <SelectedSessions OnRemove="RemoveSessionHandler" @ref="selectedSessionsComponent" />
       </CascadingValue>
     </div>
   </div>
@@ -24,6 +24,7 @@
     private EditRegistrationViewModel model;
     private string registrantName = string.Empty;
     protected SelectSessions selectSessionsComponent;
+    protected SelectedSessions selectedSessionsComponent;
 
     [Parameter]
     public string RegistrationId { get; set; }
@@ -37,6 +38,18 @@
     void AddSessionHandler(int sessionId)
     {
       model.AddSession(sessionId);
+      RefreshChildren();
+    }
+
+    void RemoveSessionHandler(int sessionId)
+    {
+      model.RemoveSession(sessionId);
+      RefreshChildren();
+    }
+
+    void RefreshChildren()
+    {
       selectSessionsComponent.Refresh();
+      selectedSessionsComponent.Refresh();
     }
 }

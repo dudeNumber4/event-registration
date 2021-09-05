@@ -64,14 +64,14 @@ else
     [Parameter] 
     public EventCallback<int> OnAdd { get; set; }
 
-    protected override void OnInitialized()
+    public void Refresh()
     {
-      model = new SelectSessionsViewModel(RegistrationService, SessionService);
       sessions = model.PopulateSessions(RegistrationId);
     }
 
-    public void Refresh()
+    protected override void OnInitialized()
     {
+      model = new SelectSessionsViewModel(RegistrationService, SessionService);
       sessions = model.PopulateSessions(RegistrationId);
     }
 

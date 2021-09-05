@@ -39,6 +39,12 @@ namespace EventRegistration.ViewModels
             var registrant = _registrantService.GetRegistrant(Registration.RegistrantId.ToString());
             _registrationService.AddSession(registrant.Id, sessionId);
         }
+        
+        public void RemoveSession(int sessionId)
+        {
+            var registrant = _registrantService.GetRegistrant(Registration.RegistrantId.ToString());
+            _registrationService.RemoveSession(registrant.Id, sessionId);
+        }
 
     }
 
