@@ -34,6 +34,12 @@ namespace EventRegistration.ViewModels
         private EditRegistrationViewModel(RegistrationService registrationService, RegistrantService registrantService, string registrationId) :base(registrationService)
             => _registrantService = registrantService;
 
+        public void AddSession(int sessionId)
+        {
+            var registrant = _registrantService.GetRegistrant(Registration.RegistrantId.ToString());
+            _registrationService.AddSession(registrant.Id, sessionId);
+        }
+
     }
 
 }

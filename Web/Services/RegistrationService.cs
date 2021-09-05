@@ -17,5 +17,12 @@ namespace EventRegistration.Services
             var result = new Registration { RegistrantId = registrantId };
             return result with { Id = _eventRepository.AddRecord(EventRepository.RecordTypes.Registration, result) };
         }
+
+        public void AddSession(int registrantId, int sessionId)
+        {
+            var registration = GetRegistrationBy(registrantId);
+            registration.SessionIds.Add(sessionId);
+            _eventRepository.UpdateRecord(registration, EventRepository.RecordTypes.Registration);
+        }
     }
 }

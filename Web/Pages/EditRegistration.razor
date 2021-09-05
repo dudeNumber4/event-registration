@@ -4,13 +4,12 @@
 @inject RegistrationService RegistrationService
 @inject RegistrantService RegistrantService
 
-<h3>Edit Registration for @registrantName</h3>
-
+<div class="alert alert-dark">Edit Registration for @registrantName</div>
 <div class="container-fluid">
   <div class="row">
     <div class="col">
       <CascadingValue Value="RegistrationId">
-        <SelectSessions />
+        <SelectSessions OnAdd="AddSessionHandler" @ref="selectSessionsComponent" />
       </CascadingValue>
     </div>
     <div class="col">
@@ -24,6 +23,7 @@
 @code {
     private EditRegistrationViewModel model;
     private string registrantName = string.Empty;
+    protected SelectSessions selectSessionsComponent;
 
     [Parameter]
     public string RegistrationId { get; set; }
@@ -32,5 +32,11 @@
     {
       model = EditRegistrationViewModel.CreateAsync(RegistrationService, RegistrantService, RegistrationId);
       registrantName = model.RegistrantName();
+    }
+
+    void AddSessionHandler(int sessionId)
+    {
+      model.AddSession(sessionId);
+      selectSessionsComponent.Refresh();
     }
 }

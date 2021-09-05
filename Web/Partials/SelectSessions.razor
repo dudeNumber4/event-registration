@@ -1,6 +1,7 @@
 ﻿@using EventRegistration.Services
 @using EventRegistration.ViewModels
 @using EventModels
+@using System.Diagnostics
 @inject RegistrationService RegistrationService
 @inject SessionService SessionService
 
@@ -44,7 +45,7 @@ else
           @session.Description
         </div>
         <div class="col">
-          <button @onclick="AddSession" class="btn btn-primary btn-sm">Add</button>
+          <button @onclick="@(() => OnAdd.InvokeAsync(session.Id))" class="btn btn-primary btn-sm">Add</button>
         </div>
       </div>
     }
@@ -54,21 +55,24 @@ else
 
 @code {
 
-  private SessionList sessions = null;
-  private SelectSessionsViewModel model;
+    private SessionList sessions = null;
+    private SelectSessionsViewModel model;
 
-  [CascadingParameter]
-  public string RegistrationId { get; set; }
+    [CascadingParameter]
+    public string RegistrationId { get; set; }
 
-  protected override void OnInitialized()
-  {
-    model = new SelectSessionsViewModel(RegistrationService, SessionService);
-    sessions = model.PopulateSessions(RegistrationId);
-  }
+    [Parameter] 
+    public EventCallback<int> OnAdd { get; set; }
 
-  void AddSession(MouseEventArgs args)
-  {
+    protected override void OnInitialized()
+    {
+      model = new SelectSessionsViewModel(RegistrationService, SessionService);
+      sessions = model.PopulateSessions(RegistrationId);
+    }
 
-  }
+    public void Refresh()
+    {
+      sessions = model.PopulateSessions(RegistrationId);
+    }
 
 }
