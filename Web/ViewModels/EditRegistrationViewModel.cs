@@ -12,23 +12,11 @@ namespace EventRegistration.ViewModels
 
         private RegistrantService _registrantService;
 
-        public static EditRegistrationViewModel CreateAsync(RegistrationService registrationService, RegistrantService registrantService, string registrationId)
+        public static EditRegistrationViewModel Create(RegistrationService registrationService, RegistrantService registrantService, string registrationId)
         {
             EditRegistrationViewModel result = new(registrationService, registrantService, registrationId);
-            if (int.TryParse(registrationId, out var s))
-                result.Registration = registrationService.GetRegistration(s);
+            result.RegistrationId = registrationId;
             return result;
-        }
-
-        public string RegistrantName()
-        {
-            if (Registration is null)
-                return string.Empty;
-            else
-            {
-                var registrant = _registrantService.GetRegistrant(Registration.RegistrantId.ToString());
-                return registrant?.ToName();
-            }
         }
 
         private EditRegistrationViewModel(RegistrationService registrationService, RegistrantService registrantService, string registrationId) :base(registrationService)

@@ -1,8 +1,59 @@
-﻿@page "/itinerary/{RegistrantId}"
+﻿@using EventRegistration.Services
+@using EventModels
+@using EventRegistration.ViewModels
+@inject RegistrationService RegistrationService
+@inject SessionService SessionService
+@inject RegistrantService RegistrantService
+@inject NavigationManager NavigationManager
 
-<h3>Itinerary</h3>
+@page "/itinerary/{RegistrationId}"
+
+<div class="alert alert-primary">Itinerary for @registrantName</div>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col col-4 bold">Day</div>
+    <div class="col col-4 bold">Title</div>
+    <div class="col col-4 bold">Description</div>
+  </div>
+</div>
+<ul class="list-group">
+  @foreach (var session in sessions.OrderBy(s => s.Day))
+  {
+    <li class="list-group-item">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col col-4">@session.Day</div>
+          <div class="col col-4">@session.Title</div>
+          <div class="col col-4">@session.Description</div>
+        </div>
+      </div>
+    </li>
+  }
+</ul>
+<div class="container-fluid content">
+  <div class="row">
+    <div class="col-11">
+    </div>
+    <div class="col-1">
+      <button type="button" class="btn btn-primary" @onclick="@(() => Edit())">Edit</button>
+    </div>
+  </div>
+</div>
 
 @code {
+    private SessionList sessions = null;
+    private ItineraryViewModel model;
+    private string registrantName = string.Empty;
+
     [Parameter]
-    public string RegistrantId { get; set; }
+    public string RegistrationId { get; set; }
+
+    void Edit() => NavigationManager.NavigateTo($"edit-registration/{model.Registration.Id}");
+
+    protected override void OnInitialized()
+    {
+      model = ItineraryViewModel.Create(RegistrationService, RegistrationId);
+      registrantName = model.RegistrantName(RegistrantService);
+      sessions = model.PopulateSelectedSessions(SessionService, RegistrationId);
+    }
 }

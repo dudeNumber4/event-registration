@@ -11,7 +11,7 @@
 }
 else
 {
-  <h6>Available Sessions</h6>
+  <h6 class="alert alert-secondary">Available Sessions</h6>
   <hr />
 
   <div class="container">
@@ -25,7 +25,7 @@ else
       <div class="col">
         Description
       </div>
-      <div class="col">
+      <div class="col col-1">
         &nbsp;
       </div>
     </div>
@@ -44,7 +44,7 @@ else
         <div class="col">
           @session.Description
         </div>
-        <div class="col">
+        <div class="col col-1">
           <button @onclick="@(() => OnAdd.InvokeAsync(session.Id))" class="btn btn-primary btn-sm">Add</button>
         </div>
       </div>

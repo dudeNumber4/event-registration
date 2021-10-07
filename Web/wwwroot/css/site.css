@@ -10,6 +10,10 @@ app {
     flex-direction: column;
 }
 
+.bold {
+    font-weight: bold;
+}
+
 .top-row {
     height: 3.5rem;
     display: flex;

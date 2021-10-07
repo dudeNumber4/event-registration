@@ -3,8 +3,9 @@
 @using EventRegistration.Services
 @inject RegistrationService RegistrationService
 @inject RegistrantService RegistrantService
+@inject NavigationManager NavigationManager
 
-<div class="alert alert-dark">Edit Registration for @registrantName</div>
+<div class="alert alert-primary">Edit Registration for @registrantName</div>
 <div class="container-fluid">
   <div class="row">
     <div class="col">
@@ -19,6 +20,15 @@
     </div>
   </div>
 </div>
+<div class="container-fluid content">
+  <div class="row">
+    <div class="col-11">
+    </div>
+    <div class="col-1">
+      <button type="button" class="btn btn-primary" @onclick="@(() => Confirm())">Confirm</button>
+    </div>
+  </div>
+</div>
 
 @code {
     private EditRegistrationViewModel model;
@@ -29,10 +39,13 @@
     [Parameter]
     public string RegistrationId { get; set; }
 
+    // no validation necessary
+    void Confirm() => NavigationManager.NavigateTo($"itinerary/{model.Registration.Id}");
+
     protected override void OnInitialized()
     {
-      model = EditRegistrationViewModel.CreateAsync(RegistrationService, RegistrantService, RegistrationId);
-      registrantName = model.RegistrantName();
+      model = EditRegistrationViewModel.Create(RegistrationService, RegistrantService, RegistrationId);
+      registrantName = model.RegistrantName(RegistrantService);
     }
 
     void AddSessionHandler(int sessionId)

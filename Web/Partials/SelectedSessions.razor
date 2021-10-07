@@ -4,7 +4,7 @@
 @inject RegistrationService RegistrationService
 @inject SessionService SessionService
 
-<h6>Selected Sessions</h6>
+<h6 class="alert alert-secondary">Selected Sessions</h6>
 <hr />
 <ul class="list-group">
   @foreach (var session in sessions)
@@ -13,10 +13,10 @@
   <li class="list-group-item">
     <div class="container-fluid">
       <div class="row">
-        <div class="col-11">
+        <div class="col col-10">
           <span>@session.Title (@session.Day)</span>
         </div>
-        <div class="col-1">
+        <div class="col col-1">
           <button @onclick="@(() => OnRemove.InvokeAsync(session.Id))" class="btn btn-primary btn-sm">Remove</button>
         </div>
       </div>
@@ -36,15 +36,12 @@
     [Parameter]
     public EventCallback<int> OnRemove { get; set; }
 
-    public void Refresh()
-    {
-      sessions = model.PopulateSessions(RegistrationId);
-    }
+    public void Refresh() => sessions = model.PopulateSelectedSessions(SessionService, RegistrationId);
 
     protected override void OnInitialized()
     {
       model = new SelectedSessionsViewModel(RegistrationService, SessionService);
-      sessions = model.PopulateSessions(RegistrationId);
+      sessions = model.PopulateSelectedSessions(SessionService, RegistrationId);
     }
 
 }
