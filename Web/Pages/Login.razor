@@ -37,10 +37,10 @@
       {
         if (!model.RegistrationExists())
           model.CreateRegistration(model.Registrant.Id);
-        //if (model.SessionsExist())
-        //  NavigationManager.NavigateTo($"itinerary/{model.Registration.Id}");
-        //else
-        NavigationManager.NavigateTo($"edit-registration/{model.Registration.Id}");
+        if (model.SessionsExist())
+          NavigationManager.NavigateTo($"itinerary/{model.Registration.Id}");
+        else
+          NavigationManager.NavigateTo($"edit-registration/{model.Registration.Id}");
       }
       else
       {
