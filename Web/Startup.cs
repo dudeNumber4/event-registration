@@ -1,9 +1,11 @@
 using EventRegistration.Services;
+using EventRepository;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using EventRepo = EventRepository.EventRepository;
 using System;
 using System.Linq;
 
@@ -26,6 +28,7 @@ namespace EventRegistration
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
+            services.AddSingleton<IEventRepository>((_) => new EventRepo(new DefaultDataPreparer()));
             services.AddSingleton<SessionService>();
             services.AddSingleton<RegistrantService>();
             services.AddSingleton<RegistrationService>();

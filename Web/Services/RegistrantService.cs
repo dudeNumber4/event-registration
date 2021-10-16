@@ -1,13 +1,13 @@
 ﻿using EventModels;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
+using EventRepository;
 
 namespace EventRegistration.Services
 {
 
     public class RegistrantService : ServiceBase
     {
+
+        public RegistrantService(IEventRepository eventRepo) : base(eventRepo) { }
 
         /// <summary>
         /// 

@@ -10,10 +10,29 @@ using System.Threading.Tasks;
 namespace EventRepository
 {
 
+    public interface IEventRepository
+    {
+        void UpdateRecord(IEventRecord eventRecord, RecordTypes rt);
+        int NextId(RecordTypes rt);
+        int AddRecord(RecordTypes rt, IEventRecord record);
+        void DeleteFile(RecordTypes rt);
+        void DeleteRecord(string id, RecordTypes rt);
+        List<string> GetRecord(string id, RecordTypes rt);
+        public Registration GetRegistration(int id);
+        public Registration GetRegistrationBy(int registrantId);
+        public Registrant GetRegistrant(int id);
+        public Registrant GetRegistrant(string email);
+        public Session GetSession(int id);
+        public List<Session> GetAllSessions();
+        public List<Registrant> GetAllRegistrants();
+        public List<Registration> GetAllRegistrations();
+        public string DataPath();
+    }
+
     /// <summary>
     /// This could quite obviously benefit from caching, not the purpose of this solution.
     /// </summary>
-    public class EventRepository
+    public class EventRepository: IEventRepository
     {
 
         public EventRepository(IDataPreparer dataPreparer)
@@ -79,6 +98,7 @@ namespace EventRepository
             var record = GetCSharpList(DataUtils.GetRecord(id.ToString(), RecordTypeConverter.GetFileName(RecordTypes.Registration)));
             return new Registration().FromBasicRecord(record) as Registration;
         }
+        
         public Registration GetRegistrationBy(int registrantId)
         {
             var registrations = GetAllRegistrations();  // not built for speed
@@ -124,6 +144,8 @@ namespace EventRepository
             FSharpList<FSharpList<string>> registrations = DataUtils.GetAllRegistrations();
             return GetCSharpList(registrations).Select(r => new Registration().FromBasicRecord(r) as Registration).ToList();
         }
+
+        public string DataPath() => DataDriver.DataPath;
 
         /// <summary>
         /// 

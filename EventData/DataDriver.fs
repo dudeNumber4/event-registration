@@ -12,7 +12,7 @@ module DataDriver =
   
   let mutable DataPath = defaultPath
   
-  let internal getDataFilePath record =
+  let public getDataFilePath record =
     match record with
     | RegistrantRecord r -> Path.Combine(DataPath, RecordTypes.registrantFileName)
     | SessionRecord r -> Path.Combine(DataPath, RecordTypes.sessionFileName)

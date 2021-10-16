@@ -15,6 +15,8 @@ namespace EventRegistration.Services
     public class SessionService: ServiceBase
     {
 
+        public SessionService(IEventRepository eventRepo) : base(eventRepo) { }
+
         public List<Session> GetAllSessions() => _eventRepository.GetAllSessions();
 
         public void EditSession(Session s) => _eventRepository.UpdateRecord(s, RecordTypes.Session);

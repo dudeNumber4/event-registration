@@ -11,9 +11,9 @@ namespace EventRepository
         Registration, Registrant, Session
     }
 
-    internal static class RecordTypeConverter
+    public static class RecordTypeConverter
     {
-        internal static string GetFileName(RecordTypes rt) => rt switch
+        public static string GetFileName(RecordTypes rt) => rt switch
         {
             RecordTypes.Registration => EventData.RecordTypes.registrationFileName,
             RecordTypes.Registrant => EventData.RecordTypes.registrantFileName,

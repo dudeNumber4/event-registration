@@ -22,7 +22,7 @@ namespace UnitTests
         private static EventRepo _eventRepository;
 
         [ClassInitialize]
-        public static void ClassInit(TestContext tc) => _eventRepository = new EventRepo(new TempDataPreparer());
+        public static void ClassInit(TestContext _) => _eventRepository = new EventRepo(new TestDataPreparer());
 
         [TestMethod]
         public void GetAllSessions()

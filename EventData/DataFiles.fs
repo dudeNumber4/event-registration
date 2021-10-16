@@ -1,7 +1,6 @@
 ﻿namespace EventData
 
 module DataUtils =
-  open System.Reflection
   open System.IO
   open System
   open RecordTypes

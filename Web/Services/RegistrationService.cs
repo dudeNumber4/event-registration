@@ -1,13 +1,13 @@
 ﻿using EventModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using EventRepository;
 
 namespace EventRegistration.Services
 {
     public class RegistrationService : ServiceBase
     {
+
+        public RegistrationService(IEventRepository eventRepo) : base(eventRepo) { }
+
         public Registration GetRegistrationBy(int registrantId) => _eventRepository.GetRegistrationBy(registrantId);
         
         public Registration GetRegistration(int id) => _eventRepository.GetRegistration(id);
