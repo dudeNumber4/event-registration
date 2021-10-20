@@ -60,6 +60,9 @@ else
     [CascadingParameter]
     public string RegistrationId { get; set; }
 
+    /// <summary>
+    /// Subscribed to by parent component.
+    /// </summary>
     [Parameter] 
     public EventCallback<int> OnAdd { get; set; }
 

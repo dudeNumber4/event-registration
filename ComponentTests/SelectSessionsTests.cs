@@ -8,7 +8,11 @@ using EventRegistration.Services;
 using Microsoft.Extensions.DependencyInjection;
 using EventRepo = EventRepository.EventRepository;
 using EventRepository;
+using Microsoft.AspNetCore.Components;
 using System.IO;
+using Microsoft.AspNetCore.Components.Web;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace ComponentTests
 {
@@ -26,12 +30,13 @@ namespace ComponentTests
         [ClassInitialize]
         public static void ClassInit(MS_TestContext _)
         {
+            // dependencies
             _blazorTestContext.Services.AddSingleton(preparer);
             var eventRepository = new EventRepo(preparer);
-            InitializeDataFiles(eventRepository.DataPath());
             _blazorTestContext.Services.AddSingleton<IEventRepository>(eventRepository);
             _blazorTestContext.Services.AddSingleton<RegistrationService>();
             _blazorTestContext.Services.AddSingleton<SessionService>();
+            InitializeDataRepository(eventRepository.DataPath());
         }
 
         [ClassCleanup]
@@ -44,13 +49,29 @@ namespace ComponentTests
         }
 
         [TestMethod]
-        public void ComponentRenders()
+        public void ComponentRendersProperly()
         {
             var cut = _blazorTestContext.RenderComponent<SelectSessions>(parameters => parameters.Add(p => p.RegistrationId, "1"));
             cut.MarkupMatches(TestResources.SelectSessionsComponentRendered);
         }
-        
-        private static void InitializeDataFiles(string dataPath)
+
+        [TestMethod]
+        public void ClickHandlerDispatchesSessionId()
+        {
+            var cut = _blazorTestContext.RenderComponent<SelectSessions>(parameters => parameters.Add(p => p.RegistrationId, "1"));
+            TestEventHandler eventReceiver = new TestEventHandler();
+            cut.Instance.OnAdd = new EventCallback<int>(eventReceiver, null);
+            var firstButton = cut.FindAll("button")[0];
+            firstButton.Click();
+            var ticks = Environment.TickCount;
+            while (((Environment.TickCount - ticks) < 500) && (eventReceiver.ValueReceived == 0))
+            {
+                Thread.Sleep(3);
+            }
+            Assert.IsTrue(eventReceiver.ValueReceived > 0);
+        }
+
+        private static void InitializeDataRepository(string dataPath)
         {
             _sessionPath = Path.Combine(dataPath, RecordTypeConverter.GetFileName(RecordTypes.Session));
             _registrantPath = Path.Combine(dataPath, RecordTypeConverter.GetFileName(RecordTypes.Registrant));
