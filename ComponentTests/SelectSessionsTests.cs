@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading;
 using BU_TestContext = Bunit.TestContext;
@@ -54,6 +55,7 @@ namespace ComponentTests
         }
 
         [TestMethod]
+        [SuppressMessage("Test Handler", "BL0005:Component parameter should not be set outside of its component")]
         public void ClickHandlerDispatchesSessionId()
         {
             var cut = _blazorTestContext.RenderComponent<SelectSessions>(parameters => parameters.Add(p => p.RegistrationId, "1"));
