@@ -1,18 +1,16 @@
-﻿using System;
+﻿using Bunit;
 using EventRegistration.Partials;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Bunit;
-using BU_TestContext = Bunit.TestContext;
-using MS_TestContext = Microsoft.VisualStudio.TestTools.UnitTesting.TestContext;
 using EventRegistration.Services;
-using Microsoft.Extensions.DependencyInjection;
-using EventRepo = EventRepository.EventRepository;
 using EventRepository;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.IO;
-using Microsoft.AspNetCore.Components.Web;
-using System.Threading.Tasks;
 using System.Threading;
+using BU_TestContext = Bunit.TestContext;
+using EventRepo = EventRepository.EventRepository;
+using MS_TestContext = Microsoft.VisualStudio.TestTools.UnitTesting.TestContext;
 
 namespace ComponentTests
 {
