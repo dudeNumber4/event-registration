@@ -4,25 +4,24 @@ using EventRegistration.Partials;
 using Microsoft.AspNetCore.Components;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Diagnostics.CodeAnalysis;
-using MS_TestContext = Microsoft.VisualStudio.TestTools.UnitTesting.TestContext;
 
 namespace ComponentTests
 {
     
     [TestClass]
-    public class SelectSessionsTests
+    public class SelectSessionsTests: TestBase
     {
 
-        [ClassInitialize]
-        public static void ClassInit(MS_TestContext _) => TestDriver.Init();
+        [TestInitialize]
+        public void ClassInit() => Init();
 
-        [ClassCleanup]
-        public static void Cleanup() => TestDriver.Cleanup();
+        [TestCleanup]
+        public void TestCleanup() => Cleanup();
 
         [TestMethod]
         public void ComponentRendersProperly()
         {
-            var cut = TestDriver.BlazorTestContext.RenderComponent<SelectSessions>(parameters => parameters.Add(p => p.RegistrationId, "1"));
+            var cut = BlazorTestContext.RenderComponent<SelectSessions>(parameters => parameters.Add(p => p.RegistrationId, "1"));
             cut.MarkupMatches(TestResources.SelectSessionsComponentRendered);
         }
 
@@ -30,12 +29,12 @@ namespace ComponentTests
         [SuppressMessage("TestEventHandler", "BL0005:Component parameter should not be set outside of its component")]
         public void ClickHandlerDispatchesSessionId()
         {
-            var cut = TestDriver.BlazorTestContext.RenderComponent<SelectSessions>(parameters => parameters.Add(p => p.RegistrationId, "1"));
+            var cut = BlazorTestContext.RenderComponent<SelectSessions>(parameters => parameters.Add(p => p.RegistrationId, "1"));
             TestEventHandler eventReceiver = new TestEventHandler();
             cut.Instance.OnAdd = new EventCallback<int>(eventReceiver, null);
             var firstButton = cut.FindAll("button")[0];
             firstButton.Click();
-            TestDriver.WaitFor(() => eventReceiver.ValueReceived != 0);
+            TestBase.WaitFor(() => eventReceiver.ValueReceived != 0);
             Assert.IsTrue(eventReceiver.ValueReceived > 0);
         }
 

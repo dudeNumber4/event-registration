@@ -2,24 +2,21 @@
 using Bunit;
 using EventRegistration.Pages;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MS_TestContext = Microsoft.VisualStudio.TestTools.UnitTesting.TestContext;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ComponentTests
 {
 
     [TestClass]
-    public class EditRegistrationTests
+    public class EditRegistrationTests: TestBase
     {
-        [ClassInitialize]
-        public static void ClassInit(MS_TestContext _) => TestDriver.Init();
+        
+        [TestInitialize]
+        public void ClassInit() => Init();
 
-        [ClassCleanup]
-        public static void Cleanup() => TestDriver.Cleanup();
+        [TestCleanup]
+        public void TestCleanup() => Cleanup();
 
         [TestMethod]
         public void CanMoveSessionFromAvailToSelected()
@@ -33,7 +30,7 @@ namespace ComponentTests
                 return false;
             }
 
-            var cut = TestDriver.BlazorTestContext.RenderComponent<EditRegistration>(parameters => parameters.Add(p => p.RegistrationId, "1"));
+            var cut = BlazorTestContext.RenderComponent<EditRegistration>(parameters => parameters.Add(p => p.RegistrationId, "1"));
             Assert.AreEqual(1, GetSelectedItems(cut).Count());
             var selectedSessionList = cut.Find("ul");
             Assert.AreEqual(1, selectedSessionList.Children.Length);
@@ -42,7 +39,7 @@ namespace ComponentTests
             var firstSessionName = firstSessionDiv.InnerHtml;
             var firstButton = cut.FindAll("button")[0];  // button near first avail
             firstButton.Click();  // add first item from avail to selected
-            TestDriver.WaitFor(() => GetSelectedItems(cut).Count() > 0);
+            TestBase.WaitFor(() => GetSelectedItems(cut).Count() > 0);
             Assert.IsTrue(SelectedItemsContains(cut, firstSessionName));
         }
 

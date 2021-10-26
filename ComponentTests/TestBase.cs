@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using BU_TestContext = Bunit.TestContext;
 using EventRepo = EventRepository.EventRepository;
@@ -12,14 +11,14 @@ using EventRepo = EventRepository.EventRepository;
 namespace ComponentTests
 {
     
-    internal class TestDriver
+    public class TestBase
     {
         
-        internal static BU_TestContext BlazorTestContext = new BU_TestContext();
-        internal static IDataPreparer preparer = new TestDataPreparer();
-        internal static string _registrationPath;
-        internal static string _registrantPath;
-        internal static string _sessionPath;
+        protected BU_TestContext BlazorTestContext = new BU_TestContext();
+        private IDataPreparer preparer = new TestDataPreparer();
+        private string _registrationPath;
+        private string _registrantPath;
+        private string _sessionPath;
 
         internal static void WaitFor(Func<bool> f)
         {
@@ -30,8 +29,8 @@ namespace ComponentTests
             }
         }
 
-        //[TestInitialize]
-        internal static void Init()
+        [TestInitialize]
+        internal void Init()
         {
             // dependencies
             BlazorTestContext.Services.AddSingleton(preparer);
@@ -43,8 +42,8 @@ namespace ComponentTests
             InitializeDataRepository(eventRepository.DataPath());
         }
 
-        //[TestCleanup]
-        internal static void Cleanup()
+        [TestCleanup]
+        internal void Cleanup()
         {
             BlazorTestContext.Dispose();
             if (File.Exists(_registrationPath)) File.Delete(_registrationPath);
@@ -52,7 +51,7 @@ namespace ComponentTests
             if (File.Exists(_sessionPath)) File.Delete(_sessionPath);
         }
 
-        private static void InitializeDataRepository(string dataPath)
+        private void InitializeDataRepository(string dataPath)
         {
             _sessionPath = Path.Combine(dataPath, RecordTypeConverter.GetFileName(RecordTypes.Session));
             _registrantPath = Path.Combine(dataPath, RecordTypeConverter.GetFileName(RecordTypes.Registrant));
