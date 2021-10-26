@@ -100,8 +100,8 @@ namespace ComponentTests {
         ///      &lt;div class=&quot;col col-1&quot;&gt;
         ///        &amp;nbsp;
         ///      &lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;container&quot;&gt;&lt;div class=&quot;row mt-1&quot;&gt;&lt;div class=&quot;col&quot;&gt;Friday&lt;/div&gt;
-        ///        &lt;div class=&quot;col&quot;&gt;Angular&lt;/div&gt;
-        ///        &lt;div class=&quot;col&quot;&gt;Learn the art of f [rest of string was truncated]&quot;;.
+        ///        &lt;div class=&quot;col session-title-selectable&quot;&gt;Angular&lt;/div&gt;
+        ///        &lt;div class [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string SelectSessionsComponentRendered {
             get {

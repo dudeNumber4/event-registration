@@ -14,7 +14,7 @@
     <div class="container-fluid">
       <div class="row">
         <div class="col col-10">
-          <span>@session.Title (@session.Day)</span>
+          <span class="session-title-selected">@session.Title (@session.Day)</span>
         </div>
         <div class="col col-1">
           <button @onclick="@(() => OnRemove.InvokeAsync(session.Id))" class="btn btn-primary btn-sm">Remove</button>

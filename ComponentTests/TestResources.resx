@@ -138,16 +138,16 @@
       &lt;div class="col col-1"&gt;
         &amp;nbsp;
       &lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="container"&gt;&lt;div class="row mt-1"&gt;&lt;div class="col"&gt;Friday&lt;/div&gt;
-        &lt;div class="col"&gt;Angular&lt;/div&gt;
+        &lt;div class="col session-title-selectable"&gt;Angular&lt;/div&gt;
         &lt;div class="col"&gt;Learn the art of frustration&lt;/div&gt;
         &lt;div class="col col-1"&gt;&lt;button blazor:onclick="1" class="btn btn-primary btn-sm"&gt;Add&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="row mt-1"&gt;&lt;div class="col"&gt;Thursday&lt;/div&gt;
-        &lt;div class="col"&gt;Thursday&amp;#x27;s Session&lt;/div&gt;
+        &lt;div class="col session-title-selectable"&gt;Thursday&amp;#x27;s Session&lt;/div&gt;
         &lt;div class="col"&gt;This session takes place on thursday&lt;/div&gt;
         &lt;div class="col col-1"&gt;&lt;button blazor:onclick="2" class="btn btn-primary btn-sm"&gt;Add&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="row mt-1"&gt;&lt;div class="col"&gt;Wednesday&lt;/div&gt;
-        &lt;div class="col"&gt;Clean Coding&lt;/div&gt;
+        &lt;div class="col session-title-selectable"&gt;Clean Coding&lt;/div&gt;
         &lt;div class="col"&gt;Code like a boss, yo&lt;/div&gt;
         &lt;div class="col col-1"&gt;&lt;button blazor:onclick="3" class="btn btn-primary btn-sm"&gt;Add&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="row mt-1"&gt;&lt;div class="col"&gt;Tuesday&lt;/div&gt;
-        &lt;div class="col"&gt;Underwater Basketweaving&lt;/div&gt;
+        &lt;div class="col session-title-selectable"&gt;Underwater Basketweaving&lt;/div&gt;
         &lt;div class="col"&gt;Classic worthless session&lt;/div&gt;
         &lt;div class="col col-1"&gt;&lt;button blazor:onclick="4" class="btn btn-primary btn-sm"&gt;Add&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;</value>
   </data>
